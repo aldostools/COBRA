@@ -107,3 +107,9 @@ Original COBRA payload was relying on ps1emu's detection method, now COBRA has e
 	- /dev_flash/ps3ita/webftp_server.sprx
 	- /dev_flash/webman/webftp_server.sprx 
 	- /dev_flash/dragon/web.sprx
+
+[TheRouletteBoi]
+- Added a better set process memory by using the function used to actually write to process, this will allow user to write to memory where writing permissions are disabled. 
+- Added ps3mapi_process_page_allocate this function will allocate memory into the eboot process allowing your to write/read/execute code into start_address parameter 
+- Added ps3mapi_get_process_module_segments which will get the name, module path, module segments, module start and module stop address all in one function 
+- Added ps3mapi_create_process_thread to create thread into the process, This is useful if you want to load a small function into the process without needed make and load a sprx module

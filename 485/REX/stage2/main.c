@@ -98,7 +98,7 @@ int disable_cobra_stage()
 	uint8_t *buf;
 	uint64_t size;
 	int src, dst;
-	
+
 	page_allocate_auto(NULL, 0x40000, 0x2F, (void **)&buf);
 
 	// CEX
@@ -114,7 +114,7 @@ int disable_cobra_stage()
 	}
 
 	if (cellFsOpen(CB_LOCATION".bak", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
-	{	
+	{
 		cellFsWrite(dst, buf, len, &size);
 		cellFsClose(dst);
 	}
@@ -137,7 +137,7 @@ int disable_cobra_stage()
 	}
 
 	if (cellFsOpen(CB_LOCATION_DEX".bak", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
-	{	
+	{
 		cellFsWrite(dst, buf, len_DEX, &size);
 		cellFsClose(dst);
 	}
@@ -146,7 +146,7 @@ int disable_cobra_stage()
 		page_free(NULL, buf, 0x2F);
 		return -1;
 	}
-	
+
 	page_free(NULL, buf, 0x2F);
 	cellFsUnlink(CB_LOCATION);
 	cellFsUnlink(CB_LOCATION_DEX);
@@ -215,34 +215,34 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	extend_kstack(0);
 
 	//DPRINTF("Syscall 8 -> %lx\n", function);
-	if(function>=0x8000000000000000ULL)	
+	if(function>=0x8000000000000000ULL)
 		DPRINTF("LV1 peek %lx %llux\n", function, (long long unsigned int)(lv1_peekd(function)));
-	
+
 	// -- AV: temporary disable cobra syscall (allow dumpers peek 0x1000 to 0x9800)
 	static uint8_t tmp_lv1peek = 0;
 
 	if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0 && ps3mapi_access_granted)
 	{
-		if((function >= 0x9800) || (function & 3)) 
+		if((function >= 0x9800) || (function & 3))
 			tmp_lv1peek=0; else
 
-		if(function <= 0x1000) 
+		if(function <= 0x1000)
 		{
-			tmp_lv1peek=1; 
+			tmp_lv1peek=1;
 
-			if(function <= SYSCALL8_OPCODE_ENABLE_COBRA) 
+			if(function <= SYSCALL8_OPCODE_ENABLE_COBRA)
 			{
-				if(param1>=SYSCALL8_DISABLE_COBRA_CAPABILITY) 
-					return (param1==SYSCALL8_DISABLE_COBRA_CAPABILITY) ? SYSCALL8_DISABLE_COBRA_OK : disable_cobra; 
-				else 
+				if(param1>=SYSCALL8_DISABLE_COBRA_CAPABILITY)
+					return (param1==SYSCALL8_DISABLE_COBRA_CAPABILITY) ? SYSCALL8_DISABLE_COBRA_OK : disable_cobra;
+				else
 					disable_cobra = (function==SYSCALL8_OPCODE_DISABLE_COBRA && param1==1);
 			}
 		}
 
-		if(tmp_lv1peek) 		
-			return lv1_peekd(function);		
+		if(tmp_lv1peek)
+			return lv1_peekd(function);
 	}
-	else 
+	else
 		tmp_lv1peek=0;
 	// --
 
@@ -281,9 +281,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	}
 */
 
-	if ((function == SYSCALL8_OPCODE_PS3MAPI) && ((int)param1 == PS3MAPI_OPCODE_REQUEST_ACCESS) && (param2 == ps3mapi_key) && (ps3mapi_access_tries < 3)) 
+	if ((function == SYSCALL8_OPCODE_PS3MAPI) && ((int)param1 == PS3MAPI_OPCODE_REQUEST_ACCESS) && (param2 == ps3mapi_key) && (ps3mapi_access_tries < 3))
 	{
-		ps3mapi_access_tries = 0; 
+		ps3mapi_access_tries = 0;
 		ps3mapi_access_granted = 1;
 	}
 
@@ -291,7 +291,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	{
 		ps3mapi_access_tries += 1;
 
-		if(ps3mapi_access_tries > 3) 
+		if(ps3mapi_access_tries > 3)
 			ps3mapi_access_tries = 99;
 
 		return ENOSYS;
@@ -306,19 +306,19 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				ps3mapi_partial_disable_syscall8 = (int)param2;
 				return SUCCEEDED;
 			}
-			else if ((int)param1 == PS3MAPI_OPCODE_PCHECK_SYSCALL8)			
-				return ps3mapi_partial_disable_syscall8;			
+			else if ((int)param1 == PS3MAPI_OPCODE_PCHECK_SYSCALL8)
+				return ps3mapi_partial_disable_syscall8;
 			else return ENOSYS;
 		}
-		else 
+		else
 			return ENOSYS;
 	}
 
-	if ((function != SYSCALL8_OPCODE_PS3MAPI) && (2 <= ps3mapi_partial_disable_syscall8)) 
+	if ((function != SYSCALL8_OPCODE_PS3MAPI) && (2 <= ps3mapi_partial_disable_syscall8))
 		return ENOSYS;
 
 	// -- AV: disable cobra without reboot (use lv1 peek)
-	if(disable_cobra) 
+	if(disable_cobra)
 		return lv1_peekd(function);
 
 	switch (function)
@@ -402,6 +402,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_SET_PROC_MEM:
 					return ps3mapi_set_process_mem((process_id_t)param2, param3, (char *)param4, (int)param5);
 				break;
+				case PS3MAPI_OPCODE_PROC_PAGE_ALLOCATE:
+					return ps3mapi_process_page_allocate((process_id_t)param2, param3, param4, param5, (uint32_t *)param6); // TheRouletteBoi
+				break;
 
 				//----------
 				//MODULE
@@ -417,6 +420,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				break;
 				case PS3MAPI_OPCODE_GET_PROC_MODULE_INFO:
 					return ps3mapi_get_process_module_info((process_t)param2, (sys_prx_id_t)param3, (char *)param4, (char *)param5);
+				break;
+				case PS3MAPI_OPCODE_GET_PROC_MODULE_SEGMENTS:
+					return ps3mapi_get_process_module_segments((process_id_t)param2, (sys_prx_id_t)param3, (sys_prx_module_info_t *)param4); // TheRouletteBoi
 				break;
 				case PS3MAPI_OPCODE_LOAD_PROC_MODULE:
 					return ps3mapi_load_process_modules((process_id_t)param2, (char *)param3, (void *)param4, (uint32_t)param5);
@@ -545,22 +551,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		}
 		break;
 
-		case SYSCALL8_OPCODE_GET_VERSION:
-			return sys_get_version((uint32_t *)param1);
-		break;
-		
-		case SYSCALL8_OPCODE_USE_PS2NETEMU:
-			return bc_to_net((int)param1);
-		break;
-
-		case SYSCALL8_OPCODE_DISABLE_COBRA_STAGE:
-			return disable_cobra_stage();
-		break;
-		
-		case SYSCALL8_OPCODE_GET_VERSION2:
-			return sys_get_version2((uint16_t *)param1);
-		break;
-
+		//--------------------------
+		// STORAGE
+		//--------------------------
 		case SYSCALL8_OPCODE_GET_DISC_TYPE:
 			return sys_storage_ext_get_disc_type((unsigned int *)param1, (unsigned int *)param2, (unsigned int *)param3);
 		break;
@@ -577,6 +570,24 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			return sys_storage_ext_get_emu_state((sys_emu_state_t *)param1);
 		break;
 
+		case SYSCALL8_OPCODE_USE_PS2NETEMU:
+			return bc_to_net((int)param1);
+		break;
+
+		//--------------------------
+		// COBRA VERSION
+		//--------------------------
+		case SYSCALL8_OPCODE_GET_VERSION:
+			return sys_get_version((uint32_t *)param1);
+		break;
+
+		case SYSCALL8_OPCODE_GET_VERSION2:
+			return sys_get_version2((uint16_t *)param1);
+		break;
+
+		//--------------------------
+		// MOUNT
+		//--------------------------
 		case SYSCALL8_OPCODE_MOUNT_PS3_DISCFILE:
 			return sys_storage_ext_mount_ps3_discfile(param1, (char **)param2);
 		break;
@@ -587,18 +598,6 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 
 		case SYSCALL8_OPCODE_MOUNT_BD_DISCFILE:
 			return sys_storage_ext_mount_bd_discfile(param1, (char **)param2);
-		break;
-		
-		case SYSCALL8_OPCODE_RUN_PAYLOAD:
-			return inst_and_run_kernel((uint8_t *)param1, param2);
-		break;
-
-		case SYSCALL8_OPCODE_RUN_PAYLOAD_DYNAMIC:
-			return inst_and_run_kernel_dynamic((uint8_t *)param1, param2, (uint64_t *)param3);
-		break;
-
-		case SYSCALL8_OPCODE_UNLOAD_PAYLOAD_DYNAMIC:
-			return unload_plugin_kernel(param1);
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_PSX_DISCFILE:
@@ -620,6 +619,24 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		case SYSCALL8_OPCODE_MOUNT_ENCRYPTED_IMAGE:
 			return sys_storage_ext_mount_encrypted_image((char *)param1, (char *)param2, (char *)param3, param4);
 
+		//--------------------------
+		// KERNEL PAYLOAD
+		//--------------------------
+		case SYSCALL8_OPCODE_RUN_PAYLOAD:
+			return inst_and_run_kernel((uint8_t *)param1, param2);
+		break;
+
+		case SYSCALL8_OPCODE_RUN_PAYLOAD_DYNAMIC:
+			return inst_and_run_kernel_dynamic((uint8_t *)param1, param2, (uint64_t *)param3);
+		break;
+
+		case SYSCALL8_OPCODE_UNLOAD_PAYLOAD_DYNAMIC:
+			return unload_plugin_kernel(param1);
+		break;
+
+		//--------------------------
+		// PERMISSIONS
+		//--------------------------
 		case SYSCALL8_OPCODE_GET_ACCESS:
 			return sys_permissions_get_access();
 		break;
@@ -628,6 +645,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			return sys_permissions_remove_access();
 		break;
 
+		//--------------------------
+		// CONFIG
+		//--------------------------
 		case SYSCALL8_OPCODE_READ_COBRA_CONFIG:
 			return sys_read_cobra_config((CobraConfig *)param1);
 		break;
@@ -636,11 +656,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			return sys_write_cobra_config((CobraConfig *)param1);
 		break;
 
-		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
-			//return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5);
-			return 0;
-		break;
-
+		//--------------------------
+		// PSP
+		//--------------------------
 		case SYSCALL8_OPCODE_SET_PSP_UMDFILE:
 			vsh_process = get_vsh_process(); //NzV
 			if(vsh_process) get_vsh_offset();
@@ -694,10 +712,10 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			open_path_callback.addr = (void*)MKA(param1);
 			open_path_callback.toc = (void *)MKA(param2);
 		break;
-		case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
-			return ENOSYS; //sys_vsh_spoof_version((char *)param1);
-		break;
 
+		//--------------------------
+		// PLUGINS
+		//--------------------------
 		case SYSCALL8_OPCODE_LOAD_VSH_PLUGIN:
 			return sys_prx_load_vsh_plugin(param1, (char *)param2, (void *)param3, param4);
 		break;
@@ -705,6 +723,14 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		case SYSCALL8_OPCODE_UNLOAD_VSH_PLUGIN:
 			return sys_prx_unload_vsh_plugin(param1);
 		break;
+
+		//--------------------------
+		// PROCESS
+		//--------------------------
+		case SYSCALL8_OPCODE_PROC_CREATE_THREAD:
+			return ps3mapi_create_process_thread((process_id_t)param1, (thread_t *)param2, (void *)param3, (uint64_t)param4, (int)param5, (size_t)param6, (const char *)param7); // TheRouletteBoi
+		break;
+
 		//--------------------------
 		// ADVANCED POKE (syscall8)
 		//--------------------------
@@ -752,12 +778,29 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			lv1_pokeb(param1, (uint8_t)param2);
 			return SUCCEEDED;
 		break;
+
+		//--------------------------
+		// MISC
+		//--------------------------
 		case SYSCALL8_OPCODE_DRM_GET_DATA:
 			return sys_drm_get_data((void *)param1, param2);
 		break;
 
 		case SYSCALL8_OPCODE_SEND_POWEROFF_EVENT:
 			return sys_sm_ext_send_poweroff_event((int)param1);
+		break;
+
+		case SYSCALL8_OPCODE_DISABLE_COBRA_STAGE:
+			return disable_cobra_stage();
+		break;
+
+		case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
+			return ENOSYS; //sys_vsh_spoof_version((char *)param1);
+		break;
+
+		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
+			//return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5);
+			return 0;
 		break;
 
 #ifdef DEBUG
@@ -781,8 +824,8 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			if (extended_syscall8.addr)
 			{
 				// Lets handle a few hermes opcodes ourself, and let their payload handle the rest
-				if (function == 2)				
-					return (uint64_t)_sys_cfw_memcpy((void *)param1, (void *)param2, param3);				
+				if (function == 2)
+					return (uint64_t)_sys_cfw_memcpy((void *)param1, (void *)param2, param3);
 				else if (function == 0xC)
 				{
 					//DPRINTF("Hermes copy inst: %lx %lx %lx\n", param1, param2, param3);
@@ -865,9 +908,9 @@ int main(void)
 		LV2_OFFSET_ON_LV1 = (uint64_t)lv2_offset * 0x1000000ULL;
 		if(lv1_peekd(LV2_OFFSET_ON_LV1 + 0x3000ULL) == MKA(TOC)) break;
 	}
-	
+
 	create_syscalls();
-	
+
 #ifdef DEBUG
 	// "Laboratory"
 	//do_hook_all_syscalls();

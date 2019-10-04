@@ -8,6 +8,8 @@ set PATH=%WIN_PS3SDK%/mingw/msys/1.0/bin;%WIN_PS3SDK%/mingw/bin;%PS3DEV%/ppu/bin
 set CYGWIN=nodosfilewarning
 
 if exist stage2.bin_* del /q stage2.bin_*>nul
+if exist stage2.cex   del /q stage2.cex>nul
+if exist stage2.dex   del /q stage2.dex>nul
 
 cd stage2
 make clean
