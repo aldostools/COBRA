@@ -274,6 +274,9 @@
 /* vars */
 #define thread_info_symbol								0x37DE30
 
+/* mmapper flags temp patch */
+#define mmapper_flags_temp_patch						0x70F78
+
 /* lv1 */
 #define vsh_pos_in_ram                              0x910000
 
@@ -563,6 +566,9 @@
 
 /* vars */
 #define thread_info_symbol								0x3A4A30
+
+/* mmapper flags temp patch */
+#define mmapper_flags_temp_patch						0x74C08
 
 #endif /* FIRMWARE */
 
