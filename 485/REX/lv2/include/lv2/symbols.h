@@ -112,8 +112,9 @@
 #define cellFsWrite_symbol								0x297810
 #define cellFsLseek_symbol								0x296E98
 #define cellFsStat_symbol								0x29711C
-#define cellFsUtime_symbol 								0x298C08
-#define cellFsUnlink_internal_symbol   		 			0x19C64C
+#define cellFsUtime_symbol								0x298C08
+#define cellFsUnlink_internal_symbol					0x19C64C
+#define cellFsRename_internal_symbol					0x197104
 
 #define cellFsUtilMount_symbol							0x296C78
 #define cellFsUtilUmount_symbol 						0x296C4C
@@ -395,7 +396,8 @@
 #define cellFsLseek_symbol								0x2B1FFC
 #define cellFsStat_symbol								0x2B20B4
 #define cellFsUtime_symbol 								0x2B3A24
-#define cellFsUnlink_internal_symbol   		 			0x1A29D8
+#define cellFsUnlink_internal_symbol					0x1A29D8
+#define cellFsRename_internal_symbol					0x19D490
 
 #define cellFsUtilMount_symbol							0x2B1D70
 #define cellFsUtilUmount_symbol 						0x2B1D44

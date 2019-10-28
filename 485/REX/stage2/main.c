@@ -86,7 +86,19 @@
 #define MAKE_VERSION(cobra, fw, type) ((cobra&0xFF) | ((fw&0xffff)<<8) | ((type&0x1)<<24))
 
 
-
+int disable_cobra_stage()
+{
+	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
+	cellFsRename(CB_LOCATION, CB_LOCATION".bak");
+	cellFsRename(CB_LOCATION_DEX, CB_LOCATION_DEX".bak");
+	uint64_t size = 0x5343450000000000;
+	int dst;
+	cellFsOpen("/dev_hdd0/tmp/loadoptical", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0);
+	cellFsWrite(dst, &size, 4, &size);
+	cellFsClose(dst);
+	return 0;
+}
+/*
 int disable_cobra_stage()
 {
 	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
@@ -156,7 +168,7 @@ int disable_cobra_stage()
 	cellFsClose(dst);
 	return 0;
 }
-
+*/
 f_desc_t extended_syscall8;
 
 int64_t syscall8(uint64_t function, uint64_t param1, uint64_t param2, uint64_t param3, uint64_t param4, uint64_t param5, uint64_t param6, uint64_t param7);

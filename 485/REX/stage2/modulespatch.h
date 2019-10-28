@@ -4,22 +4,22 @@
 #include <lv2/process.h>
 #include <lv2/thread.h>
 
-#if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_85DEX)
+#if defined(FIRMWARE_4_85) || defined(FIRMWARE_4_85DEX)
 
-#define VSH_DEX_HASH					0xb6b6d000002e6000
-#define VSH_CEX_HASH					0xb6b6d000002e3000
+#define VSH_DEX_HASH					0xb6b6d000002e6000 // 0xb6b6d000002e6000
+#define VSH_CEX_HASH					0xb6b6d000002e0000 // 0xb6b6d000002e3000
 #define BDP_DISC_CHECK_PLUGIN_HASH		0x9940000000003000
-#define BASIC_PLUGINS_HASH				0x55f480000001f000
-#define EXPLORE_PLUGIN_HASH				0xc50d0000000ec000
-#define EXPLORE_CATEGORY_GAME_HASH		0xde52c00000056000
-#define PS1_EMU_HASH					0xcc2840000009b000
-#define PS1_NETEMU_HASH 				0xcc284000000be000
-#define GAME_EXT_PLUGIN_HASH			0xcc2680000001e000
-#define PSP_EMULATOR_HASH				0xcc29b00000023000
+#define BASIC_PLUGINS_HASH				0x55f4700000010000 // 0x55f480000001f000
+#define EXPLORE_PLUGIN_HASH				0xc50d0000000e0000 // 0xc50d0000000ec000
+#define EXPLORE_CATEGORY_GAME_HASH		0xde52d00000050000 // 0xde52c00000056000
+#define PS1_EMU_HASH					0xcc28400000090000 // 0xcc2840000009b000
+#define PS1_NETEMU_HASH 				0xcc284000000b0000 // 0xcc284000000be000
+#define GAME_EXT_PLUGIN_HASH			0xcc26800000010000 // 0xcc2680000001e000
+#define PSP_EMULATOR_HASH				0xcc29b00000020000 // 0xcc29b00000023000
 #define PEMUCORELIB_HASH				0x40425000000c0000
-#define EMULATOR_API_HASH				0x8409f0000001b000
+#define EMULATOR_API_HASH				0x8409f00000010000 // 0x8409f0000001b000
 #define EMULATOR_DRM_HASH				0xbbb8800000005000
-#define EMULATOR_DRM_DATA_HASH			0x2f3ab0000001b000
+#define EMULATOR_DRM_DATA_HASH			0x2f3ab00000010000 // 0x2f3ab0000001b000
 #define LIBSYSUTIL_SAVEDATA_PSP_HASH	0x0dfdc00000003000
 #define LIBFS_EXTERNAL_HASH				0x05fd000000006000
 
@@ -65,14 +65,17 @@
 #define cex_vmode_patch_offset			0x4431DC
 
 /* basic_plugins */
-//#define ps1emu_type_check_offset		0x20234
-//#define pspemu_path_offset			0x4BBC8
-//#define psptrans_path_offset			0x4C830
+//#define ps1emu_type_check_offset		0x1F78C // 0x20234
+//#define pspemu_path_offset			0x4A9F8 // 0x4BBC8
+//#define psptrans_path_offset			0x4B628 // 0x4C830
 
 /* explore_plugin */
-#define app_home_offset					0x2514C0
-#define ps2_nonbw_offset				0xDDDC4
+#define app_home_offset					0x250910 // 0x2514C0
+#define ps2_nonbw_offset				0xDD9B4  // 0xDDDC4
 //#define whatsnew_offset				0x26E9B0
+
+/* explore_category_game */
+#define ps2_nonbw_offset2				0x68324 //0x68264
 
 /* nas_plugin */
 //#define patch1_nas					0x2eae4
@@ -105,9 +108,6 @@
 /* libaudio */
 //#define bt_usb_audio_offset			0xF80
 
-/* explore_category_game */
-#define ps2_nonbw_offset2				0x68264
-
 /* bdp_disccheck_plugin */
 #define dvd_video_region_check_offset	0x152C
 
@@ -118,10 +118,10 @@
 #define ps1_netemu_get_region_offset	0xA4E74 // seg003:00000000000A4E74                 lwzu      r11, 4(r4)
 
 /* game_ext_plugin */
-#define sfo_check_offset				0x23DAC
-#define ps2_nonbw_offset3				0x172F0
-#define ps_region_error_offset			0x687C
-#define game_exit_popup_patch       	0xE418
+#define sfo_check_offset				0x23B90 // 0x23DAC
+#define ps2_nonbw_offset3				0x17000 // 0x172F0
+#define ps_region_error_offset			0x68C0  // 0x687C
+#define game_exit_popup_patch			0xE418  // TO-DO
 
 /* psp_emulator */
 #define psp_set_psp_mode_offset 		0x1C18

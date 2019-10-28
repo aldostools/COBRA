@@ -6,9 +6,9 @@
 #include <lv2/patch.h>
 #include <lv1/lv1.h>
 
-#if defined (FIRMWARE_4_84)
+#if defined (FIRMWARE_4_85)
 	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.cex"
-#elif defined (FIRMWARE_4_84DEX)
+#elif defined (FIRMWARE_4_85DEX)
 	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.dex"
 #endif
 

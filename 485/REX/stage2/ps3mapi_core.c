@@ -322,7 +322,7 @@ int ps3mapi_get_process_module_segments(process_id_t pid, sys_prx_id_t prx_id, s
 	if (ret != SUCCEEDED)
 		return EINVAL;
 
-	if ((modinfo.segments == NULL) || (modinfo.filename == NULL) || (modinfo.segments_num == 0) || (modinfo.filename_size == 0))
+	if ((modinfo.segments == 0) || (modinfo.filename == 0) || (modinfo.segments_num == 0) || (modinfo.filename_size == 0))
 	{
 		return EFAULT;
 	}

@@ -12,10 +12,10 @@ typedef struct
 
 static Patch kernel_patches[] =
 {
-#ifdef DO_PATCH_PS2
+	#ifdef DO_PATCH_PS2
 	// sys_sm_shutdown, for ps2 let's pass to copy_from_user a fourth parameter
 	{ shutdown_patch_offset, MR(R6, R31) },
-#endif
+	#endif
 	// User thread prio hack (needed for netiso)
 	{ user_thread_prio_patch, NOP },
 	{ user_thread_prio_patch2, NOP },
