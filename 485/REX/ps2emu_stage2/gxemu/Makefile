@@ -12,7 +12,7 @@ BUILD_TYPE      = release
 
 CFLAGS = -ffunction-sections -fdata-sections -Os -m64 -fno-builtin -fno-exceptions \
 			   -Os -Wall -Wno-strict-aliasing $(foreach dir,$(INCLUDE),-I$(dir)) \
-			   -DPS2EMU -DPS2GXEMU -DFIRMWARE_4_84 -ffreestanding 
+			   -DPS2EMU -DPS2GXEMU -DFIRMWARE_4_85 -ffreestanding 
 CFLAGS += --std=gnu99
 
 ifeq ($(BUILD_TYPE), debug)

@@ -570,7 +570,7 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 
 	// +4.30 -> 0x13 (exact firmware since it happens is unknown)
 	// 3.55 -> 0x29
-#if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_85DEX)
+#if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_85DEX)  || defined(FIRMWARE_4_86) || defined(FIRMWARE_4_86DEX)
 	if ((p[0x30/4] >> 16) == 0x13)
 #endif
 	{
@@ -786,7 +786,7 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 	return 0;
 }
 
-#if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_85)
+#if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_86)
 LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, pre_modules_verification, (uint32_t *ret, uint32_t error))
 {
 /*
@@ -803,7 +803,7 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, pre_modules_verification, (uint32_t *re
 	*ret = 0;
 	return 0;
 }
-#elif defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85DEX)
+#elif defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85DEX) || defined(FIRMWARE_4_86DEX)
 LV2_HOOKED_FUNCTION_COND_POSTCALL_2(int, pre_modules_verification, (uint32_t *ret, uint32_t error))
 {
 	return DO_POSTCALL;  //Fixes fucking DEX issue, no more crying bitches  //

@@ -7,7 +7,7 @@
 
 #define PS2EMU
 #define PS2NETEMU
-#define FIRMWARE_4_84
+#define FIRMWARE_4_85
 
 #include "../../ps2emu/include/ps2emu/symbols.h"
 
