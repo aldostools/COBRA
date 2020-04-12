@@ -936,9 +936,8 @@ int main(void)
 	//do_dump_modules_info_test();
 	//do_pad_test();
 #endif
-#if defined(FIRMWARE_4_84)
+
 	map_path("/app_home", "/dev_usb000", 0); //Not needed
-#endif
 
 	return 0;
 }

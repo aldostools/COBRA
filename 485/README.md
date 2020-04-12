@@ -13,9 +13,13 @@ COBRA 8.3 Source
 * unknown E3 patches are removed to fix an issue with XMB, [Originally found by rancid-0, from his PS3ITA 4.50 COBRA]
 * Dual VSH supported for REBUG REX / D-REX CFW, with the proper hash check code was developed by habib and Nzv recently. 
 * NPDRM Fself fix is no longer used due to improved fself patches hard coded within the firmware modules on REX/D-REX 
+* Built-in reactPSN feature supported
 
 [ Habib's changes ]
 
+* Run payload with Kernel privileges
+* Boot times speed improved 
+* PS2 bc and semi bc consoles wont load iso when cobra disable - disable cobra using opcode
 * Stage0 and stage0 base are merged, (Optimization on stage0 and stage1)
 * Syscall 11 is added to support full lv1 peek.
 * Syscall 15 is added to allow execution of any lv2 internal function.
@@ -29,9 +33,6 @@ COBRA 8.3 Source
 * HASH calculation algorithm is changed, now it uses static hashes, so the hashes will not be changed unless modules have major changes.
 * Stealth extension support to disable Syscall 15
 * Allows temporary LV1 peek from syscall 8 when "disabling COBRA" is not used
-* Run payload with Kernel privileges - Added option to run payload with kernel privileges like ps vita skprx. this is a big thing! one can make hooks, printf to socat, do whatever they feel like they need to do. at the current time only one payload is supported at a time. in the future i might increase this 
-* Boot times speed improved - as there is no stage1.
-* PS2 bc and semi bc consoles wont load iso when cobra disabled - disable cobra using opcode)
 * Added support for dynamic memory payloads, 5 of them can be started from "/dev_hdd0/boot_plugins_kernel.txt"
 * Toolchain updated to support dynamic address loading.
 * For applications, you can also mount em, and unmount em separately
@@ -110,8 +111,10 @@ Original COBRA payload was relying on ps1emu's detection method, now COBRA has e
 	- /dev_flash/webman/webftp_server.sprx 
 	- /dev_flash/dragon/web.sprx
 
-[TheRouletteBoi]
-- Added a better set process memory by using the function used to actually write to process, this will allow user to write to memory where writing permissions are disabled. 
-- Added ps3mapi_process_page_allocate this function will allocate memory into the eboot process allowing your to write/read/execute code into start_address parameter 
-- Added ps3mapi_get_process_module_segments which will get the name, module path, module segments, module start and module stop address all in one function 
-- Added ps3mapi_create_process_thread to create thread into the process, This is useful if you want to load a small function into the process without needed make and load a sprx module
+[TheRouletteBoi's changes]
+
+* PS3MAPI improvements:
+	- Added a better set process memory by using the function used to actually write to process, this will allow user to write to memory where writing permissions are disabled. 
+	- Added ps3mapi_process_page_allocate this function will allocate memory into the eboot process allowing your to write/read/execute code into start_address parameter 
+	- Added ps3mapi_get_process_module_segments which will get the name, module path, module segments, module start and module stop address all in one function 
+	- Added ps3mapi_create_process_thread to create thread into the process, This is useful if you want to load a small function into the process without needed make and load a sprx module

@@ -6,18 +6,18 @@
 #include <lv2/patch.h>
 #include <lv1/lv1.h>
 
-#if defined (FIRMWARE_4_85)
+#if defined (FIRMWARE_4_84) || defined (FIRMWARE_4_85) || defined (FIRMWARE_4_86)
 	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.cex"
-#elif defined (FIRMWARE_4_85DEX)
+#elif defined (FIRMWARE_4_84DEX) || defined (FIRMWARE_4_85DEX) || defined (FIRMWARE_4_86DEX)
 	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.dex"
 #endif
 
 void main(void)
 {
 	void *stage2 = NULL;
-	
+
 	f_desc_t f;
-	int (* func)(void);	
+	int (* func)(void);
 
 	CellFsStat stat;
 	int fd;
@@ -27,41 +27,41 @@ void main(void)
 	{
 		uint64_t pte0 = *(uint64_t *)(MKA(0xf000000 | (i<<7)));
 		uint64_t pte1 = *(uint64_t *)(MKA(0xf000000 | ((i<<7)+8)));
-		
+
 		lv1_write_htab_entry(0, i << 3, pte0, (pte1 & 0xff0000) | 0x190);
 	}
-	
+
 	if (cellFsStat(STAGE2_FILE, &stat) == 0)
 	{
 		if (cellFsOpen(STAGE2_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == 0)
 		{
 			stage2 = alloc(stat.st_size, 0x27);
 			if (stage2)
-			{		
+			{
 				if (cellFsRead(fd, stage2, stat.st_size, &rs) != 0)
 				{
 					dealloc(stage2, 0x27);
 					stage2 = NULL;
 				}
-					
-			}				
-			
+
+			}
+
 			cellFsClose(fd);
 		}
-	}	
+	}
 
 	f.toc = (void *)MKA(TOC);
-	
+
 	if (stage2)
 	{
-		f.addr = stage2;			
+		f.addr = stage2;
 	}
 	else
 	{
 		f.addr=(void *)MKA(0x17e0);
 	}
-		
-	func = (void *)&f;	
+
+	func = (void *)&f;
 	func();
 
 }

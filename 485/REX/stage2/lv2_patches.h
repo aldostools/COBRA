@@ -12,9 +12,22 @@ typedef struct
 
 static Patch kernel_patches[] =
 {
+	{ patch_data1_offset, 0x01000000 },
+	{ patch_func8_offset1, LI(R3, 0) }, // force lv2open return 0
+
+	// disable calls in lv2open to lv1_send_event_locally which makes the system crash
+	{ patch_func8_offset2, NOP },
+	{ patch_func9_offset, NOP }, // 4.30 - watch: additional call after
+
+	// psjailbreak, PL3, etc destroy this function to copy their code there.
+	// We don't need that, but let's dummy the function just in case that patch is really necessary
+	{ mem_base2, LI(R3, 1) },
+	{ mem_base2 + 4, BLR },
+
 	#ifdef DO_PATCH_PS2
 	// sys_sm_shutdown, for ps2 let's pass to copy_from_user a fourth parameter
 	{ shutdown_patch_offset, MR(R6, R31) },
+	{ module_sdk_version_patch_offset, NOP },
 	#endif
 	// User thread prio hack (needed for netiso)
 	{ user_thread_prio_patch, NOP },
