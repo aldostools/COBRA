@@ -47,13 +47,19 @@ static uint8_t *path_entries = NULL;
 
 static void init_map_entry(uint8_t index)
 {
+	if( map_table[index].newpath
+		&& (map_table[index].newpath_len > 3)
+		&& (map_table[index].newpath[0] == '/')
+		&& (map_table[index].newpath[1] == '.')
+		&& (map_table[index].newpath[2] == '/') ) return; // protect from deletion existing newpath like "/./*"
+
 	map_table[index].oldpath = NULL;
 	map_table[index].newpath = NULL;
 	map_table[index].oldpath_len = 0;
 	map_table[index].newpath_len = 0;
 	map_table[index].flags = 0;
 }
-
+/*
 void map_first_slot(char *oldpath, char *newpath)
 {
 	first_slot = 0;
@@ -73,7 +79,7 @@ void map_first_slot(char *oldpath, char *newpath)
 
 	return;
 }
-
+*/
 int map_path(char *oldpath, char *newpath, uint32_t flags)
 {
 	int8_t i, firstfree = -1, is_dev_bdvd = 0;

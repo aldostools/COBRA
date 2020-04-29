@@ -127,7 +127,7 @@ int disable_cobra_stage()
 		return -1;
 	}
 
-	if (cellFsOpen(CB_LOCATION".bak", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
+	if ((len == size) && cellFsOpen(CB_LOCATION".bak", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
 	{
 		cellFsWrite(dst, buf, len, &size);
 		cellFsClose(dst);
@@ -322,10 +322,8 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			}
 			else if ((int)param1 == PS3MAPI_OPCODE_PCHECK_SYSCALL8)
 				return ps3mapi_partial_disable_syscall8;
-			else return ENOSYS;
 		}
-		else
-			return ENOSYS;
+		return ENOSYS;
 	}
 
 	if ((function != SYSCALL8_OPCODE_PS3MAPI) && (2 <= ps3mapi_partial_disable_syscall8))
@@ -696,7 +694,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		case SYSCALL8_OPCODE_PSP_CHANGE_EMU:
-			return sys_psp_set_emu_path((char *)param1);
+			return SUCCEEDED; //sys_psp_set_emu_path((char *)param1); // deprecated
 		break;
 
 		case SYSCALL8_OPCODE_PSP_POST_SAVEDATA_INITSTART:
@@ -809,11 +807,11 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
-			return ENOSYS; //sys_vsh_spoof_version((char *)param1);
+			return ENOSYS; //sys_vsh_spoof_version((char *)param1); // deprecated
 		break;
 
-		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
-			//return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5);
+		case SYSCALL8_OPCODE_COBRA_USB_COMMAND: 
+			//return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5); // deprecated
 			return 0;
 		break;
 

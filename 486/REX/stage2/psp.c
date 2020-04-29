@@ -17,8 +17,8 @@
 uint32_t psp_tag;
 uint8_t psp_keys[16];
 uint8_t psp_code;
-char pspemu_path[36];
-char psptrans_path[37];
+//char pspemu_path[36];
+//char psptrans_path[37];
 
 #define SPRX_NUM			90
 #define NUM_SCE_PSP_MODULES	5
@@ -422,7 +422,7 @@ int sys_psp_prx_patch(uint32_t *unk, uint8_t *elf_buf, void *link_register)
 	psp_func1(unk, elf_buf);
 	return 0;
 }
-
+/*
 int sys_psp_set_emu_path(char *path)
 {
 	if (!path)
@@ -435,17 +435,19 @@ int sys_psp_set_emu_path(char *path)
 		//DPRINTF("sys_psp_set_emu_path has been deleted\n");
 	#endif
 
-	/*DPRINTF("pspemu path set to %s\n", path);
+	#if 0
+	DPRINTF("pspemu path set to %s\n", path);
 
 	path = get_secure_user_ptr(path);
 	condition_psp_change_emu = 1;
 
 	snprintf(pspemu_path, sizeof(pspemu_path), "%s/psp_emulator.self", path);
-	snprintf(psptrans_path, sizeof(psptrans_path), "%s/psp_translator.self", path);*/
+	snprintf(psptrans_path, sizeof(psptrans_path), "%s/psp_translator.self", path);
+	#endif
 
 	return 0;
 }
-
+*/
 int sys_psp_post_savedata_initstart(int result, void *param)
 {
 	#ifdef DEBUG

@@ -65,16 +65,16 @@
 
 #define STW(RS, D, RA) (36 << 26) | (RS << 21) | (RA << 16) | D
 
-#define	SHF_WRITE		0x01		/* sh_flags */
-#define	SHF_ALLOC		0x02
-#define	SHF_EXECINSTR		0x04
-#define	SHF_MERGE		0x10
-#define	SHF_STRINGS		0x20
-#define	SHF_INFO_LINK		0x40
-#define	SHF_LINK_ORDER		0x80
+#define	SHF_WRITE				0x01		/* sh_flags */
+#define	SHF_ALLOC				0x02
+#define	SHF_EXECINSTR			0x04
+#define	SHF_MERGE				0x10
+#define	SHF_STRINGS				0x20
+#define	SHF_INFO_LINK			0x40
+#define	SHF_LINK_ORDER			0x80
 #define	SHF_OS_NONCONFORMING	0x100
-#define	SHF_GROUP		0x200
-#define	SHF_TLS			0x400
+#define	SHF_GROUP				0x200
+#define	SHF_TLS					0x400
 
 typedef struct function_descriptor
 {
@@ -127,7 +127,6 @@ static uint32_t swap32(uint32_t data)
 	ret |= (((data) & 0xff00) << 8);
 	ret |= (((data) & 0xff0000) >> 8);
 	ret |= (((data) >> 24) & 0xff);
-
 	return ret;
 }
 
@@ -320,7 +319,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("ufs_read_patched found at %lx\n", addr);
-				hook_function_with_cond_postcall(ufs_read_symbol, ps2_netemu+addr, 4);
+				hook_function_with_cond_postcall(ufs_read_symbol, ps2_netemu + addr, 4);
 			}
 			else if (strcmp(name, "ufs_fstat_patched") == 0)
 			{
@@ -334,7 +333,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("ufs_fstat_patched found at %lx\n", addr);
-				hook_function_with_cond_postcall(ufs_fstat_symbol, ps2_netemu+addr, 2);
+				hook_function_with_cond_postcall(ufs_fstat_symbol, ps2_netemu + addr, 2);
 			}*/
 			/*else if (strcmp(name, "ufs_open_patched") == 0)
 			{
@@ -348,10 +347,10 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("ufs_open_patched found at %lx\n", addr);
-				hook_function_with_cond_postcall(ufs_open_symbol, ps2_netemu+addr, 2);
+				hook_function_with_cond_postcall(ufs_open_symbol, ps2_netemu + addr, 2);
 			}*/
 			//else
-				if (strcmp(name, "cdvd_read_patched") == 0)
+			if (strcmp(name, "cdvd_read_patched") == 0)
 			{
 				addr = get_func_address(line);
 
@@ -363,7 +362,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("cdvd_read_patched found at %lx\n", (unsigned long)addr);
-				hook_function_with_cond_postcall(cdvd_read_symbol, ps2_netemu+addr, 4);
+				hook_function_with_cond_postcall(cdvd_read_symbol, ps2_netemu + addr, 4);
 			}
 			else if (strcmp(name, "read_iso_size") == 0)
 			{
@@ -377,7 +376,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("read_iso_size found at %lx\n", (unsigned long)addr);
-				patch_call(read_iso_size_call, ps2_netemu+addr);
+				patch_call(read_iso_size_call, ps2_netemu + addr);
 			}
 			else if (strcmp(name, "fstat_iso_patched") == 0)
 			{
@@ -391,7 +390,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("fstat_iso_patched found at %lx\n", (unsigned long)addr);
-				patch_call(fstat_iso_call, ps2_netemu+addr);
+				patch_call(fstat_iso_call, ps2_netemu + addr);
 			}
 			else if (strcmp(name, "open_config") == 0)
 			{
@@ -405,7 +404,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("open_config found at %lx\n", (unsigned long)addr);
-				patch_call(open_config_call, ps2_netemu+addr);
+				patch_call(open_config_call, ps2_netemu + addr);
 			}
 			else if (strcmp(name, "read_config_size") == 0)
 			{
@@ -419,7 +418,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("read_config_size found at %lx\n", (unsigned long)addr);
-				patch_call(read_config_size_call, ps2_netemu+addr);
+				patch_call(read_config_size_call, ps2_netemu + addr);
 			}
 			else if (strcmp(name, "decrypt_config") == 0)
 			{
@@ -433,7 +432,7 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("decrypt_config found at %lx\n", (unsigned long)addr);
-				patch_call(decrypt_config_call, ps2_netemu+addr);
+				patch_call(decrypt_config_call, ps2_netemu + addr);
 			}
 			else if (strcmp(name, "open_iso") == 0)
 			{
@@ -447,8 +446,8 @@ static int patch_emu(char *payload_map_file)
 				}
 
 				printf("open_iso found at %lx\n", (unsigned long)addr);
-				patch_call(open_iso_call1, ps2_netemu+addr);
-				patch_call(open_iso_call2, ps2_netemu+addr);
+				patch_call(open_iso_call1, ps2_netemu + addr);
+				patch_call(open_iso_call2, ps2_netemu + addr);
 			}
 		}
 		else
@@ -637,8 +636,8 @@ int main(int argc, char *argv[])
 
 	//command3("self_rebuilder", "temp.elf", self_output, "temp.self");
 	command15("scetool", "-v", "--sce-type=SELF", "--compress-data=TRUE", "--compress-data=TRUE", "--skip-sections=FALSE",
-		 "--self-auth-id=1020000401000001", "--self-add-shdrs=TRUE", "--self-vendor-id=02000003", "--self-type=LV2",
-	         "--self-fw-version=0004003000000000", "--key-revision=0", "--self-app-version=0004008400000000", "--encrypt", "temp.elf", self_output);
+			 "--self-auth-id=1020000401000001", "--self-add-shdrs=TRUE", "--self-vendor-id=02000003", "--self-type=LV2",
+			 "--self-fw-version=0004003000000000", "--key-revision=0", "--self-app-version=0004008400000000", "--encrypt", "temp.elf", self_output);
 
 	//system("rm temp.elf");
 

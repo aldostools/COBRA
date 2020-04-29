@@ -103,17 +103,17 @@ uint8_t condition_disable_gameupdate = 0; // Disabled
 uint8_t condition_psp_iso = 0;
 uint8_t condition_psp_dec = 0;
 uint8_t condition_psp_keys = 0;
-uint8_t condition_psp_change_emu = 0;
+//uint8_t condition_psp_change_emu = 0;
 uint8_t condition_psp_prometheus = 0;
 uint8_t condition_pemucorelib = 1;
-uint64_t vsh_check;
+uint64_t vsh_check = 0;
 //uint8_t condition_game_ext_psx=0;
-int bc_to_net_status=0;
+static int bc_to_net_status = 0;
 
 //uint8_t block_peek = 0;
 
 // Plugins
-sys_prx_id_t vsh_plugins[MAX_VSH_PLUGINS];
+static sys_prx_id_t vsh_plugins[MAX_VSH_PLUGINS];
 static int loading_vsh_plugin;
 
 static SprxPatch cex_vsh_patches[] =
@@ -911,45 +911,45 @@ int bc_to_net(int param)
 	if(condition_ps2softemu)
 		return -1;
 
-	if(param==1) //enable netemu
+	if(param == 1) //enable netemu
 	{
 		switch(vsh_check)
 		{
 			case VSH_CEX_HASH:
-			copy_to_process(vsh_process, &cex_vsh_patches[0].data, (void *)(uint64_t)(0x10000+cex_vsh_patches[0].offset), 4);
-			copy_to_process(vsh_process, &cex_vsh_patches[1].data, (void *)(uint64_t)(0x10000+cex_vsh_patches[1].offset), 4);
+			copy_to_process(vsh_process, &cex_vsh_patches[0].data, (void *)(uint64_t)(0x10000 + cex_vsh_patches[0].offset), 4);
+			copy_to_process(vsh_process, &cex_vsh_patches[1].data, (void *)(uint64_t)(0x10000 + cex_vsh_patches[1].offset), 4);
 			break;
 
 			case VSH_DEX_HASH:
-			copy_to_process(vsh_process, &dex_vsh_patches[0].data, (void *)(uint64_t)(0x10000+dex_vsh_patches[0].offset), 4);
-			copy_to_process(vsh_process, &dex_vsh_patches[1].data, (void *)(uint64_t)(0x10000+dex_vsh_patches[1].offset), 4);
+			copy_to_process(vsh_process, &dex_vsh_patches[0].data, (void *)(uint64_t)(0x10000 + dex_vsh_patches[0].offset), 4);
+			copy_to_process(vsh_process, &dex_vsh_patches[1].data, (void *)(uint64_t)(0x10000 + dex_vsh_patches[1].offset), 4);
 			break;
 		}
 
-		bc_to_net_status=1;
+		bc_to_net_status = 1;
 		return 1;
 	}
 
-	if(param==0) //restore
+	if(param == 0) //restore
 	{
 		switch(vsh_check)
 		{
 			case VSH_CEX_HASH:
-			copy_to_process(vsh_process, &cex_vsh_patches[2].data, (void *)(uint64_t)(0x10000+cex_vsh_patches[2].offset), 4);
-			copy_to_process(vsh_process, &cex_vsh_patches[3].data, (void *)(uint64_t)(0x10000+cex_vsh_patches[3].offset), 4);
+			copy_to_process(vsh_process, &cex_vsh_patches[2].data, (void *)(uint64_t)(0x10000 + cex_vsh_patches[2].offset), 4);
+			copy_to_process(vsh_process, &cex_vsh_patches[3].data, (void *)(uint64_t)(0x10000 + cex_vsh_patches[3].offset), 4);
 			break;
 
 			case VSH_DEX_HASH:
-			copy_to_process(vsh_process, &dex_vsh_patches[2].data, (void *)(uint64_t)(0x10000+dex_vsh_patches[2].offset), 4);
-			copy_to_process(vsh_process, &dex_vsh_patches[3].data, (void *)(uint64_t)(0x10000+dex_vsh_patches[3].offset), 4);
+			copy_to_process(vsh_process, &dex_vsh_patches[2].data, (void *)(uint64_t)(0x10000 + dex_vsh_patches[2].offset), 4);
+			copy_to_process(vsh_process, &dex_vsh_patches[3].data, (void *)(uint64_t)(0x10000 + dex_vsh_patches[3].offset), 4);
 			break;
 		}
 
-		bc_to_net_status=0;
+		bc_to_net_status = 0;
 		return 0;
 	}
 
-	if(param==2)
+	if(param == 2)
 		return bc_to_net_status;
 
 	return -2;

@@ -155,7 +155,7 @@ static void dump_process(process_t process)
 
 	sprintf(path, "/dev_usb000/%s.heap_segment", get_process_name(process));
 
-	ret = cellFsOpen(path, CELL_FS_O_WRONLY|CELL_FS_O_CREAT|CELL_FS_O_TRUNC, &fd, 0666, NULL, 0);
+	ret = cellFsOpen(path, CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &fd, 0666, NULL, 0);
 	if (ret != 0)
 	{
 		DPRINTF("Cannot create %s\n", path);
@@ -182,7 +182,7 @@ static void dump_process(process_t process)
 
 static void dump_processes(void)
 {
-	uint64_t *proc_list = *(uint64_t **)MKA(TOC+process_rtoc_entry_1);
+	uint64_t *proc_list = *(uint64_t **)MKA(TOC + process_rtoc_entry_1);
 
 	proc_list = *(uint64_t **)proc_list;
 	proc_list = *(uint64_t **)proc_list;

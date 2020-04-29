@@ -93,7 +93,7 @@
 
 #define zeroalloc_symbol			0x1447A0
 #define malloc_symbol				0x144740
-#define free_symbol				0x1447EC
+#define free_symbol					0x1447EC
 #define memcpy_symbol				0x4AF8C
 #define memset_symbol				0x4AFF8
 #define snprintf_symbol				0x4BE40
@@ -130,7 +130,7 @@
 
 #define zeroalloc_symbol			0xFDDE8
 #define malloc_symbol				0xFDD00
-#define free_symbol				0xFDE40
+#define free_symbol					0xFDE40
 #define memcpy_symbol				0xDFAC
 #define memset_symbol				0xD488
 #define strcpy_symbol				0xED04
@@ -211,7 +211,7 @@
 
 #define zeroalloc_symbol			0x1447A0
 #define malloc_symbol				0x144740
-#define free_symbol				0x1447EC
+#define free_symbol					0x1447EC
 #define memcpy_symbol				0x4AF8C
 #define memset_symbol				0x4AFF8
 #define snprintf_symbol				0x4BE40
@@ -249,7 +249,7 @@
 
 #define zeroalloc_symbol			0xFDE70
 #define malloc_symbol				0xFDD88
-#define free_symbol				0xFDEC8
+#define free_symbol					0xFDEC8
 #define memcpy_symbol				0xDFAC
 #define memset_symbol				0xD488
 #define strcpy_symbol				0xED04
@@ -335,7 +335,7 @@
 
 #define zeroalloc_symbol			0xFDFEC
 #define malloc_symbol				0xFDF04
-#define free_symbol				0xFE044
+#define free_symbol					0xFE044
 #define memcpy_symbol				0xDFAC
 #define memset_symbol				0xD488
 #define strcpy_symbol				0xED04
@@ -375,7 +375,7 @@
 
 #define zeroalloc_symbol			0x1E48EC //
 #define malloc_symbol				0x1E488C //
-#define free_symbol				0x1E4938 //
+#define free_symbol					0x1E4938 //
 #define memcpy_symbol				0x514BC //
 #define memset_symbol				0x51528 //
 #define snprintf_symbol				0x52360 //
@@ -451,7 +451,7 @@
 
 #define zeroalloc_symbol			0xFDFEC
 #define malloc_symbol				0xFDF04
-#define free_symbol				0xFE044
+#define free_symbol					0xFE044
 #define memcpy_symbol				0xDFAC
 #define memset_symbol				0xD488
 #define strcpy_symbol				0xED04
@@ -491,7 +491,7 @@
 
 #define zeroalloc_symbol			0x1E48EC //
 #define malloc_symbol				0x1E488C //
-#define free_symbol				0x1E4938 //
+#define free_symbol					0x1E4938 //
 #define memcpy_symbol				0x514BC //
 #define memset_symbol				0x51528 //
 #define snprintf_symbol				0x52360 //

@@ -63,7 +63,7 @@ static uint64_t swap64(uint64_t data)
 /*static void command2(char *cmd, char *arg1, char *arg2)
 {
 	char buf[2048];
-	
+
 	snprintf(buf, sizeof(buf), "%s %s %s", cmd, arg1, arg2);
 	system(buf);
 }*/
@@ -71,7 +71,7 @@ static uint64_t swap64(uint64_t data)
 static void command3(char *cmd, char *arg1, char *arg2, char *arg3)
 {
 	char buf[2048];
-	
+
 	snprintf(buf, sizeof(buf), "%s %s %s %s", cmd, arg1, arg2, arg3);
 	system(buf);
 }
@@ -79,7 +79,7 @@ static void command3(char *cmd, char *arg1, char *arg2, char *arg3)
 static void command15(char *cmd, char *arg1, char *arg2, char *arg3, char *arg4, char *arg5, char *arg6, char *arg7, char *arg8, char *arg9, char *arg10, char *arg11, char *arg12, char *arg13, char *arg14, char *arg15)
 {
 	char buf[2048];
-	
+
 	snprintf(buf, sizeof(buf), "%s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s", cmd, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13,arg14, arg15);
 	system(buf);
 }
@@ -88,52 +88,52 @@ static void patch_self(char *src, char *dst, uint32_t sh_offset, uint32_t data_a
 {
 	char *buf;
 	FILE *f;
-	
+
 	f = fopen(src, "rb");
 	if (!f)
 	{
 		printf("Cannot open %s\n", src);
 		exit(-1);
 	}
-	
+
 	fseek(f, 0, SEEK_END);
 	int size = ftell(f);
 	fseek(f, 0, SEEK_SET);
-	
+
 	buf = malloc(size);
-	
+
 	fread(buf, 1, size, f);
 	fclose(f);
-	
+
 	Elf64_Phdr *phdr = (Elf64_Phdr *)(buf+0xD0);
-	
-	if (extend_ph)	
+
+	if (extend_ph)
 		phdr->p_memsz = swap64(swap64(phdr->p_memsz) + ADDITIONAL_SIZE);
-	
+
 	Elf64_Shdr *shdr = (Elf64_Shdr *)(buf+sh_offset);
-	
+
 	while (1)
 	{
 		uint64_t flags = swap64(shdr->sh_flags);
-		
+
 		if (swap64(shdr->sh_addr) == data_address)
 		{
 			// Grant execution on data
-			shdr->sh_flags = swap64(flags | SHF_EXECINSTR); 
+			shdr->sh_flags = swap64(flags | SHF_EXECINSTR);
 			if (extend_sh)
 				shdr->sh_size = swap64(swap64(shdr->sh_size)+ADDITIONAL_SIZE);
 			break;
 		}
-		
+
 		if (flags & SHF_EXECINSTR)
 		{
 			// Write permissions on code
 			shdr->sh_flags = swap64(flags | SHF_WRITE);
 		}
-		
+
 		shdr++;
 	}
-	
+
 	f = fopen(dst, "wb");
 	fwrite(buf, 1, size, f);
 	fclose(f);
@@ -146,13 +146,13 @@ int main(int argc, char *argv[])
 	uint32_t patch_addr, patch_data;
 	FILE *bin, *elf;
 	uint8_t *payload_buf;
-	
+
 	if (argc < 10)
 	{
 		printf("Usage: %s payload self_input self_output text_offset payload_addr sh_addr data_addr patch_addr patch_data\n", argv[0]);
 		return -1;
 	}
-	
+
 	payload = argv[1];
 	self_input = argv[2];
 	self_output = argv[3];
@@ -162,58 +162,58 @@ int main(int argc, char *argv[])
 	sscanf(argv[7], "0x%x", &data_addr);
 	sscanf(argv[8], "0x%x", &patch_addr);
 	sscanf(argv[9], "0x%x", &patch_data);
-	
+
 	patch_self(self_input, "temp.self", sh_addr, data_addr, (patch_addr != 0xFFFFFFFF) && (patch_addr != 0xFFFFFFFE), (patch_addr != 0xFFFFFFFF));
-	
+
 	//command2("unself", "temp.self", "temp.elf");
-	command3("scetool", "--decrypt", "temp.self", "temp.elf");	
-	
+	command3("scetool", "--decrypt", "temp.self", "temp.elf");
+
 	bin = fopen(payload, "rb");
 	if (!bin)
 	{
 		printf("Cannot open %s\n", payload);
 		return -2;
 	}
-	
+
 	fseek(bin, 0, SEEK_END);
 	payload_size = ftell(bin);
 	fseek(bin, 0, SEEK_SET);
-	
+
 	payload_buf = malloc(payload_size);
 	if (!payload_buf)
 	{
 		printf("Cannot allocate %d bytes.\n", payload_size);
 		return -3;
 	}
-	
+
 	fread(payload_buf, 1, payload_size, bin);
 	fclose(bin);
-	
+
 	elf = fopen("temp.elf", "rb+");
 	if (!elf)
 	{
 		printf("Cannot open temp.elf\n");
 		return -4;
 	}
-	
+
 	fseek(elf, text_offset+payload_addr, SEEK_SET);
 	fwrite(payload_buf, 1, payload_size, elf);
-	
+
 	if (patch_addr != 0 && patch_addr != 0xffffffff && patch_addr != 0xfffffffe)
 	{
 		fseek(elf, text_offset+patch_addr, SEEK_SET);
 		patch_data = SWAP32(patch_data);
 		fwrite(&patch_data, 1, 4, elf);
 	}
-	
+
 	fclose(elf);
-	
+
 	//command3("self_rebuilder", "temp.elf", self_output, "temp.self");
-	command15("scetool", "-v", "--sce-type=SELF", "--compress-data=TRUE", "--compress-data=TRUE", "--skip-sections=FALSE", 
-		 "--self-auth-id=1020000401000001", "--self-add-shdrs=TRUE", "--self-vendor-id=02000003", "--self-type=LV2", 
-	         "--self-fw-version=0004003000000000", "--key-revision=0", "--self-app-version=0004008400000000", "--encrypt", "temp.elf", self_output);
-	
+	command15("scetool", "-v", "--sce-type=SELF", "--compress-data=TRUE", "--compress-data=TRUE", "--skip-sections=FALSE",
+			 "--self-auth-id=1020000401000001", "--self-add-shdrs=TRUE", "--self-vendor-id=02000003", "--self-type=LV2",
+			 "--self-fw-version=0004003000000000", "--key-revision=0", "--self-app-version=0004008400000000", "--encrypt", "temp.elf", self_output);
+
 	//system("rm temp.elf");
-	
+
 	return 0;
 }

@@ -1,8 +1,6 @@
 #ifndef __CRYPTO_H__
 #define __CRYPTO_H__
 /*
-#include <lv2/lv2.h>
-
 typedef struct
 {
     int mode;                   //!<  encrypt/decrypt

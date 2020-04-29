@@ -240,7 +240,7 @@ int64_t debug_print(const char* buffer, size_t msgsize)
 	u16 *p = (u16*)h_ip;
 	int i;
 
-	for (i=0; i<5; i++)
+	for (i = 0; i < 5; i++)
 		sum += *p++;
 
 	h_ip->checksum = ~(sum + (sum>>16));

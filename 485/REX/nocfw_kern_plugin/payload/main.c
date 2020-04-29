@@ -278,7 +278,7 @@ void copy_emus(int emu_type)
 		cellFsRead(src, buf, 0x10000, &size);
 		cellFsClose(src);
 
-		for(int i=0;i<2;i++)
+		for(int i = 0; i < 2; i++)
 		{
 			if(cellFsOpen(ps2_files[i], CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0)==0)
 			{

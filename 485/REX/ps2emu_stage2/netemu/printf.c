@@ -279,7 +279,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list args)
 {
 	if (!format)
 		return 0;
-	
+
 	INTMAX_T value;
 	unsigned char cvalue;
 	const char *strvalue;
@@ -799,18 +799,18 @@ int printf(const char *fmt, ...)
 	char strBuf[PRINTF_MAX];
 	va_list args;
 	int written = 0;
-	
+
 	if (vars->debug_offset >= MAX_LOG)
 		return 0;
 
 	va_start(args, fmt);
 	written = vsnprintf(strBuf, PRINTF_MAX, fmt, args);
-	va_end(args);	
-	
+	va_end(args);
+
 	if (vars->debug_offset + written <= MAX_LOG)
 	{
 		int fd;
-		
+
 		fd = ufs_open(0, "/log_file.bin");
 		if (fd >= 0)
 		{
@@ -823,10 +823,10 @@ int printf(const char *fmt, ...)
 	{
 		vars->debug_offset = MAX_LOG;
 	}
-	
-	return written;	
+
+	return written;
 }
 
 #endif /* DEBUG */
 
- 
+

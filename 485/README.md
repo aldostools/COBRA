@@ -92,6 +92,8 @@ Original COBRA payload was relying on ps1emu's detection method, now COBRA has e
 * Auto-mount dev_blind
 * Query map path table (SYSCALL8_OPCODE_GET_MAP_PATH)
 * Support for 32 map path entries
+* Support for non deletable map path entries (allow updates) /./path/etc
+* Support for partial map paths (search non existing files in original path) //path/etc
 * Fixed status returned by dynamic kernel plugins (unsigned function returned -1, -2, etc)
 
 [ Alexander's changes ]
