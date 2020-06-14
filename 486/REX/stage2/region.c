@@ -1,9 +1,9 @@
-#include <stdio.h>
 #include <lv2/lv2.h>
 #include <lv2/libc.h>
 #include <lv2/process.h>
 #include <lv2/patch.h>
 #include <lv2/syscall.h>
+#include <lv2/error.h>
 #include "common.h"
 #include "region.h"
 
@@ -64,10 +64,12 @@ static INLINE void set_dvd_video_region(uint8_t *region)
 				return;
 		}
 		else if (dvd_video_region_map[i].region == dvd_video_region)		
+		{
 			fake_region = dvd_video_region_map[i].ps3_region;		
+		}
 	}
 	
-	if (fake_region != 0)
+	if (fake_region)
 		*region = fake_region;
 }
 
@@ -83,7 +85,9 @@ static INLINE void set_bd_video_region(uint8_t *region)
 				return;
 		}
 		else if (bd_video_region_map[i].region == bd_video_region)		
+		{
 			fake_region = bd_video_region_map[i].ps3_region;		
+		}
 	}
 	
 	if (fake_region != 0)
@@ -101,14 +105,14 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_2(int, region_func, (uint64_t func, uint8_t 
 		char *procname = get_process_name(get_current_process_critical());
 		if (procname)
 		{
-			if (strcmp(procname+8, "_main_bdp_BDVD.self") == 0)
+			if (strcmp(procname + 8, "_main_bdp_BDVD.self") == SUCCEEDED)
 			{
-				if (dvd_video_region != 0)				
+				if (dvd_video_region)				
 					set_dvd_video_region(&buf[3]);				
 			}
-			else if (strcmp(procname+8, "_main_bdp_BDMV.self") == 0)
+			else if (strcmp(procname+8, "_main_bdp_BDMV.self") == SUCCEEDED)
 			{
-				if (bd_video_region != 0)				
+				if (bd_video_region)				
 					set_bd_video_region(&buf[3]);				
 			}
 		}		

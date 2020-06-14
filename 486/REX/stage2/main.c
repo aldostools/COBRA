@@ -93,12 +93,11 @@ int disable_cobra_stage()
 	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
 	cellFsRename(CB_LOCATION, CB_LOCATION".bak");
 	cellFsRename(CB_LOCATION_DEX, CB_LOCATION_DEX".bak");
-	uint64_t size = 0x5343450000000000;
-	int dst;
-	cellFsOpen("/dev_hdd0/tmp/loadoptical", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0);
-	cellFsWrite(dst, &size, 4, &size);
-	cellFsClose(dst);
-	return 0;
+
+	uint64_t sce = 0x534345000000000; // SCE
+	save_file("/dev_hdd0/tmp/loadoptical", (void*)sce, 4);
+
+	return SUCCEEDED;
 }
 /*
 int disable_cobra_stage()
@@ -164,12 +163,10 @@ int disable_cobra_stage()
 	page_free(NULL, buf, 0x2F);
 	cellFsUnlink(CB_LOCATION);
 	cellFsUnlink(CB_LOCATION_DEX);
-	size = 0x5343450000000000;
-	cellFsOpen("/dev_hdd0/tmp/loadoptical", CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0);
-	cellFsWrite(dst, &size, 4, &size);
-	cellFsClose(dst);
-	return 0;
-}
+	sce = 0x5343450000000000;
+	save_file("/dev_hdd0/tmp/loadoptical", (void*)sce, 4);
+
+	return SUCCEEDED;}
 */
 f_desc_t extended_syscall8;
 
@@ -235,29 +232,28 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 	// -- AV: temporary disable cobra syscall (allow dumpers peek 0x1000 to 0x9800)
 	static uint8_t tmp_lv1peek = 0;
 
-	if(ps3mapi_partial_disable_syscall8 == 0 && extended_syscall8.addr == 0 && ps3mapi_access_granted)
+	if((ps3mapi_partial_disable_syscall8 == 0) && (extended_syscall8.addr == 0) && ps3mapi_access_granted)
 	{
-		if((function >= 0x9800) || (function & 3))
-			tmp_lv1peek=0; else
-
-		if(function <= 0x1000)
+		if((function >= 0x9800) || (function & 3)) tmp_lv1peek = 0; else // normal syscall 8
+		if( function <= 0x1000)
 		{
-			tmp_lv1peek=1;
-
+			tmp_lv1peek = 1; // enable lv1 peek if lv1peek address <= 0x1000 (e.g. lv1 dump)
 			if(function <= SYSCALL8_OPCODE_ENABLE_COBRA)
 			{
-				if(param1>=SYSCALL8_DISABLE_COBRA_CAPABILITY)
-					return (param1==SYSCALL8_DISABLE_COBRA_CAPABILITY) ? SYSCALL8_DISABLE_COBRA_OK : disable_cobra;
+				if(param1 >= SYSCALL8_DISABLE_COBRA_CAPABILITY)
+					return (param1 == SYSCALL8_DISABLE_COBRA_CAPABILITY) ?
+								SYSCALL8_DISABLE_COBRA_OK :  // <- syscall3(sycall8, 0, 2) can disable: returns 0x5555;
+								disable_cobra;               // <- syscall3(sycall8, 0, 3) is disabled? returns 0/1
 				else
-					disable_cobra = (function==SYSCALL8_OPCODE_DISABLE_COBRA && param1==1);
+					disable_cobra = ((function == SYSCALL8_OPCODE_DISABLE_COBRA) && (param1 == 1)); // <- syscall3(sycall8, 0, 1) = disable cobra (enable lv1peek)
+																									// <- syscall3(sycall8, 1, 0) = enable cobra (disable lv1peek)
 			}
 		}
 
-		if(tmp_lv1peek)
-			return lv1_peekd(function);
+		if(tmp_lv1peek) return lv1_peekd(function); // return lv1peek(address)
 	}
 	else
-		tmp_lv1peek=0;
+		tmp_lv1peek = 0; // normal syscall 8
 	// --
 
 /*
@@ -321,7 +317,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				return SUCCEEDED;
 			}
 			else if ((int)param1 == PS3MAPI_OPCODE_PCHECK_SYSCALL8)
+			{
 				return ps3mapi_partial_disable_syscall8;
+			}
 		}
 		return ENOSYS;
 	}
@@ -629,7 +627,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_ENCRYPTED_IMAGE:
-			return sys_storage_ext_mount_encrypted_image((char *)param1, (char *)param2, (char *)param3, param4);
+			return SUCCEEDED; //sys_storage_ext_mount_encrypted_image((char *)param1, (char *)param2, (char *)param3, param4);
 
 		//--------------------------
 		// KERNEL PAYLOAD
@@ -810,7 +808,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			return ENOSYS; //sys_vsh_spoof_version((char *)param1); // deprecated
 		break;
 
-		case SYSCALL8_OPCODE_COBRA_USB_COMMAND: 
+		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
 			//return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5); // deprecated
 			return 0;
 		break;

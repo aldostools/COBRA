@@ -46,10 +46,9 @@ typedef struct
 	uint64_t nonce;
 } KeySet;
 
-
 #define N_SPRX_KEYS_1 (sizeof(sprx_keys_set1)/sizeof(KeySet))
 
-KeySet sprx_keys_set1[] =
+static KeySet sprx_keys_set1[] =
 {
 	{
 		{
@@ -1036,7 +1035,7 @@ int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_s
 
 	if (arg && arg_size > 0)
 	{
-		page_allocate_auto(vsh_process, KB(64), 0x2F, &kbuf);
+		page_allocate_auto(vsh_process, KB(64), &kbuf);
 		page_export_to_proc(vsh_process, kbuf, 0x40000, &vbuf);
 		memcpy(kbuf, arg, arg_size);
 	}
@@ -1153,20 +1152,21 @@ int sys_prx_unload_vsh_plugin(unsigned int slot)
 // static int was removed to support cfg implementation for homebrew blocker by KW & AV
 int read_text_line(int fd, char *line, unsigned int size, int *eof)
 {
-	int i = 0;
-	int line_started = 0;
-
 	if (size == 0)
 		return FAILED;
+	size--;
 
 	*eof = 0;
 
-	while (i < (size-1))
+	int i = 0;
+	int line_started = 0;
+
+	while (i < size)
 	{
 		uint8_t ch;
 		uint64_t r;
 
-		if (cellFsRead(fd, &ch, 1, &r) != 0 || r != 1)
+		if ((cellFsRead(fd, &ch, 1, &r) != SUCCEEDED) || (r != 1))
 		{
 			*eof = 1;
 			break;
@@ -1218,30 +1218,25 @@ static int load_plugin_kernel(char *path)
 
 		if(stat.st_size > 0x230)
 		{
-			int fd;
-			if(cellFsOpen(path, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == SUCCEEDED)
+			void *skprx = malloc(stat.st_size);
+
+			if(skprx)
 			{
-				void *skprx = alloc(stat.st_size, 0x27);
-
-				if(skprx)
+				if(read_file(path, skprx, stat.st_size))
 				{
-					uint64_t read;
-					if(cellFsRead(fd, skprx, stat.st_size, &read) == SUCCEEDED)
-					{
-						f_desc_t f;
-						f.addr = skprx;
-						f.toc = (void *)MKA(TOC);
+					f_desc_t f;
+					f.addr = skprx;
+					f.toc = (void *)MKA(TOC);
 
-						int (* func)(void);
-						func = (void *)&f;
-						func();
+					int (* func)(void);
+					func = (void *)&f;
+					func();
 
-						return 1;
-					}
-					else
-					{
-						dealloc(skprx, 0x27);
-					}
+					return 1;
+				}
+				else
+				{
+					free(skprx);
 				}
 			}
 		}
@@ -1451,7 +1446,7 @@ int ps3mapi_unload_vsh_plugin(char *name)
 	if (!vsh_process) {vsh_process = get_vsh_process(); //NzV
 	if (vsh_process <= 0) return ESRCH;}
 
-	char *filename = alloc(MAX_FILE_LEN, 0x35);
+	char *filename = kalloc(MAX_FILE_LEN);
 	if (!filename)
 		return ENOMEM;
 
@@ -1465,12 +1460,12 @@ int ps3mapi_unload_vsh_plugin(char *name)
 		{
 			if (strcmp(filename, get_secure_user_ptr(name)) == SUCCEEDED)
 			{
-				dealloc(filename, 0x35);
+				kfree(filename);
 				return prx_unload_vsh_plugin(slot);
 			}
 		}
 	}
 
-	dealloc(filename, 0x35);
+	kfree(filename);
 	return ESRCH;
 }

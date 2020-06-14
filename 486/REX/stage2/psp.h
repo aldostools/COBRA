@@ -73,8 +73,8 @@ typedef struct
 extern uint32_t psp_tag;
 extern uint8_t psp_keys[16];
 extern uint8_t psp_code;
-extern char pspemu_path[36];
-extern char psptrans_path[37];
+//extern char pspemu_path[36];
+//extern char psptrans_path[37];
 
 extern void psp_func1(void *unk, uint8_t *elf_buf);
 

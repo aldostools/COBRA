@@ -5,9 +5,9 @@ static INLINE void get_rebug_vsh()
 {
 	CellFsStat stat;
 
-	if(cellFsStat("/dev_flash/vsh/module/vsh.self.cexsp", &stat) == CELL_OK)
+	if(cellFsStat("/dev_flash/vsh/module/vsh.self.cexsp", &stat) == SUCCEEDED)
 		vsh_type = 0xDE;
-	else if(cellFsStat("/dev_flash/vsh/module/vsh.self.dexsp", &stat) == CELL_OK)
+	else if(cellFsStat("/dev_flash/vsh/module/vsh.self.dexsp", &stat) == SUCCEEDED)
 		vsh_type = 0xCE;
 
 	#ifdef DEBUG
@@ -36,15 +36,15 @@ static INLINE int get_vsh_offset()
 	else
 	{
 		vsh_offset = 0;
-		for(int i = 0x10000; i < 0x3000000; i += 0x10000)
+		for(int addr = 0x10000; addr < 0x3000000; addr += 0x10000)
 		{
-			if(lv1_peekd(i + 0x200) == 0xF821FF917C0802A6ULL)
+			if(lv1_peekd(addr + 0x200) == 0xF821FF917C0802A6ULL)
 			{
-				if(lv1_peekd(i + 0x208) == 0xF80100804800039DULL)
+				if(lv1_peekd(addr + 0x208) == 0xF80100804800039DULL)
 				{
-					if(lv1_peekd(i + 0x210) == 0x6000000048000405ULL)
+					if(lv1_peekd(addr + 0x210) == 0x6000000048000405ULL)
 					{
-						vsh_offset = i;
+						vsh_offset = addr;
 						#ifdef DEBUG
 						DPRINTF("Vsh.self found with brute-force at address 0x%lx\n", vsh_offset);
 						#endif
@@ -67,7 +67,7 @@ static INLINE int get_vsh_offset()
 }
 
 #ifdef DO_PATCH_PS2
-int ps2_patches_done = 0;
+//int ps2_patches_done = 0;
 
 static INLINE int ps2_vsh_patches()
 {
@@ -77,9 +77,9 @@ static INLINE int ps2_vsh_patches()
 	if(vsh_offset == 0)
 		return EINVAL;
 
-	uint64_t ps2tonet = ps2tonet_patch, ps2tonet_size = ps2tonet_size_patch;
-	uint64_t value = 0, addr = 0, addr2 = 0;
+	uint64_t addr = 0, addr2 = 0;
 	int i = 0, mv_offset = 0;
+	uint64_t ps2tonet = ps2tonet_patch, ps2tonet_size = ps2tonet_size_patch;
 
 	if(vsh_type == 0xCE)
 	{

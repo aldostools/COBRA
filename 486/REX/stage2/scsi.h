@@ -315,7 +315,7 @@ static INLINE void lba_to_msf_bcd(uint64_t lba, uint8_t *m, uint8_t *s, uint8_t 
 	*s = itob(*s);
 	*f = itob(*f);
 }
-
+/*
 static inline uint64_t msf_to_lba(uint8_t m, uint8_t s, uint8_t f)
 {
 	uint64_t lba = m;		
@@ -323,7 +323,7 @@ static inline uint64_t msf_to_lba(uint8_t m, uint8_t s, uint8_t f)
 	lba = (lba*75)+f;
 	return lba;
 }
-
+*/
 #ifdef DEBUG
 
 static const char * get_scsi_cmd_name(uint8_t cmd) __attribute__((unused));
