@@ -104,6 +104,7 @@ static INLINE int ps2_vsh_patches()
 
 	//Find ps2tonet_patch patches
 	//First try with static offset..
+	uint64_t value = 0;
 	addr = (vsh_offset + ps2tonet_size);
 	addr2 = (vsh_offset + ps2tonet);
 

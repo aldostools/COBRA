@@ -488,7 +488,7 @@ int ps3mapi_unload_process_modules(process_id_t pid, sys_prx_id_t prx_id)
 }
 
 //-----------------------------------------------
-//THREAD 
+//THREAD
 //-----------------------------------------------
 
 int ps3mapi_create_process_thread(process_id_t pid, thread_t *thread, void *entry, uint64_t arg, int prio, size_t stacksize, char *threadname) // TheRouletteBoi
