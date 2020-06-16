@@ -166,12 +166,16 @@ static inline int block_homebrew(const char *path)
 				return SUCCEEDED;
 			}
 		}
-		else if(allow_create_sc)
+		else
+		if(allow_create_sc)
 		{
-			uint8_t syscalls_disabled = ((*(uint64_t *)MKA(syscall_table_symbol + 8 * 6)) == (*(uint64_t *)MKA(syscall_table_symbol)));
-			if(syscalls_disabled && !strcmp(path, "/dev_flash/vsh/module/software_update_plugin.sprx"))
+			if(!strcmp(path, "/dev_flash/vsh/module/software_update_plugin.sprx"))
 			{
-				create_syscalls();
+				uint8_t syscalls_disabled = ((*(uint64_t *)MKA(syscall_table_symbol + 8 * 6)) == (*(uint64_t *)MKA(syscall_table_symbol)));
+				if(syscalls_disabled)
+					create_syscalls();
+
+				skip_existing_rif = 0;
 			}
 		}
 	}

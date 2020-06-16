@@ -63,7 +63,7 @@ static void get_rif_key(unsigned char *rap, unsigned char *key)
 	}
 }
 
-static uint8_t make_rif_buf[0x20 + 0x28 + 0x50 + 0x20]; // ACT_DAT[0x20] + CONTENT_ID[0x28] + RAP_PATH[0x50] + RIF_BUFFER[0x20] (rif_buffer reuse rap_path + 0x20 = 0x70)
+static uint8_t make_rif_buf[0x20 + 0x28 + 0x50 + 0x20 + 0x28]; // ACT_DAT[0x20] + CONTENT_ID[0x28] + RAP_PATH[0x50] + RIF_BUFFER[0x20] (rif_buffer reuse rap_path + 0x20 = 0x70) +0x28(signaturs)
 
 //////// make_rif memory allocation ////////////
 #define ALLOC_ACT_DAT	 (uint8_t*)(make_rif_buf)
@@ -116,11 +116,10 @@ static void read_act_dat_and_make_rif(uint8_t *rap, uint8_t *act_dat, const char
 												 // 0x50 encrypted rif_key
 		memcpy(rif + 0x60, &timestamp,       8); // 0x60 timestamp
 		memcpy(rif + 0x68, &expiration_time, 8); // 0x68 expiration time
+		memset(rif + 0x70, 0x11, 0x28);			 // 0x70 ECDSA Signature
 
 		uint64_t size;
-		cellFsWrite(fd, rif, 0x70, &size);
-		memset(rif, 0x11, 0x28);			 // 0x70 ECDSA Signature
-		cellFsWrite(fd, rif, 0x28, &size);
+		cellFsWrite(fd, rif, 0x98, &size);
 		cellFsClose(fd);
 	}
 }
@@ -165,16 +164,18 @@ static void read_act_dat_and_make_rif(uint8_t *rap, uint8_t *act_dat, const char
 }
 #endif
 
+uint8_t skip_existing_rif = 1;
+
 static void make_rif(const char *path)
 {
 	//if(!is_hdd0) return; // checked in homebrew_blocker.h
 
 	int path_len = strlen(path); if(path_len != 71) return; // example: /dev_hdd0/home/00000001/exdata/2P0001-PS2U10000_00-0000111122223333.rif
 
-	if(!strncmp(path + 10, "home/", 5) && !strcmp(path + path_len - 4, ".rif"))
+	if(!strncmp(path, "/dev_hdd0/home/", 15) && !strcmp(path + path_len - 4, ".rif"))
 	{
-		process_t process = get_current_process_critical();
-		if(!is_vsh_process(process)) return;
+		CellFsStat stat;
+		if(skip_existing_rif && (cellFsStat(path, &stat) == SUCCEEDED)) return; // rif already exists
 
 		#ifdef DEBUG
 		DPRINTF("open_path_hook: %s (looking for rap)\n", path);
@@ -189,10 +190,9 @@ static void make_rif(const char *path)
 
 		if(!is_ps2_classic)
 		{
-			CellFsStat stat;
 			sprintf(rap_path, "/dev_usb000/exdata/%.36s.rap", content_id);
-			if(cellFsStat(rap_path, &stat) != SUCCEEDED) rap_path[10] = '1'; //usb001
-			if(cellFsStat(rap_path, &stat) != SUCCEEDED) sprintf(rap_path, "/dev_hdd0/exdata/%.36s.rap", content_id);
+			if(cellFsStat(rap_path, &stat) != SUCCEEDED) {rap_path[10] = '1'; //usb001
+			if(cellFsStat(rap_path, &stat) != SUCCEEDED) sprintf(rap_path, "/dev_hdd0/exdata/%.36s.rap", content_id);}
 		}
 
 		// default: ps2classic rap

@@ -39,6 +39,7 @@ see file COPYING or http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 static int bus_id;
 static int dev_id;
 
+uint64_t *ttywrite_sc;
 static u64 bus_addr;
 
 struct ethhdr
@@ -119,10 +120,18 @@ LV2_SYSCALL(int, ttyWrite, (int channel, const char* message, int length, int* w
 	if (written)
 		*written = length;
 
+	#ifdef DEBUG
+	f_desc_t f;
+	f.addr = (void*)ttywrite_sc;
+	f.toc = (void*)MKA(TOC);
+	int (*func)(int, const char *, int, int *) = (void *)&f;
+	return func(channel, message, length, written);
+	#endif
+
 	return 0;
 }
 
-LV2_SYSCALL(int, consoleWrite, (const char* message, int length))
+LV2_SYSCALL2(int, consoleWrite, (const char* message, int length))
 {
 	debug_print(message, length);
 	return 0;
@@ -133,15 +142,27 @@ void debug_install(void)
 	suspend_intr();
 	change_function(printf_symbol, debug_printf);
 	change_function(printfnull_symbol, debug_printf);
-	patch_syscall(SYS_TTY_WRITE, ttyWrite);
-	patch_syscall(SYS_CONSOLE_WRITE, consoleWrite);
+	create_syscall2(SYS_TTY_WRITE, ttyWrite);
+	create_syscall2(SYS_CONSOLE_WRITE, consoleWrite);
 	resume_intr();
+}
+
+void debug_hook()
+{
+	change_function(printf_symbol, debug_printf);
+	change_function(printfnull_symbol, debug_printf);
 }
 
 void debug_uninstall(void)
 {
 	suspend_intr();
-	// TODO: unpatch code here
+
+	*(uint32_t *)MKA(printf_symbol) = 0xF821FF51;
+	clear_icache((void *)MKA(printf_symbol), 4);
+
+	*(uint32_t *)MKA(printfnull_symbol) = 0x38600000;
+	clear_icache((void *)MKA(printfnull_symbol), 4);
+
 	resume_intr();
 }
 
@@ -149,6 +170,10 @@ void debug_uninstall(void)
 
 int64_t debug_init(void)
 {
+	uint64_t **table = (uint64_t **)MKA(syscall_table_symbol);
+	f_desc_t *f = (f_desc_t *)table[SYS_TTY_WRITE];
+	ttywrite_sc = (uint64_t *)f->addr;
+
 	s64 result;
 	u64 v2;
 
@@ -323,4 +348,3 @@ void debug_print_hex_c(void *buf, uint64_t size)
 			_debug_printf("\n");
 	}
 }
-

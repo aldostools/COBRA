@@ -41,7 +41,7 @@
 #include "vsh_patches.h"
 #include "peek_poke.h"
 #include "fan_control.h"
-#include "reactPSN.h"
+//#include "reactPSN.h"
 #include "qa_flag.h"
 
 // Format of version:
@@ -202,6 +202,8 @@ extern f_desc_t open_path_callback;
 extern uint8_t auto_dev_blind;	// homebrew_blocker.h
 extern uint8_t allow_create_sc; // homebrew_blocker.h
 extern uint8_t photo_gui;		// mappath.c
+extern uint8_t auto_earth;		// mappath.c
+extern uint8_t earth_id;		// mappath.c
 
 static inline void ps3mapi_unhook_all(void)
 {
@@ -211,6 +213,8 @@ static inline void ps3mapi_unhook_all(void)
     unhook_all_storage_ext();
 	//unhook_all_permissions();
 }
+
+extern uint8_t skip_existing_rif; // make_rif.h
 
 static uint64_t ps3mapi_key = 0;
 static uint8_t ps3mapi_access_tries = 0;
@@ -508,6 +512,17 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_AUTO_DEV_BLIND:
 					auto_dev_blind = (uint8_t)param2;
 					return auto_dev_blind;
+				break;
+
+				case PS3MAPI_OPCODE_SKIP_EXISTING_RIF:
+					skip_existing_rif = (uint8_t)param2;
+					return skip_existing_rif;
+				break;
+
+				case PS3MAPI_OPCODE_AUTO_EARTH:
+					auto_earth = (uint8_t)param2;
+					earth_id   = (uint8_t)param3;
+					return auto_earth;
 				break;
 
 				case PS3MAPI_OPCODE_PHOTO_GUI:
@@ -893,8 +908,8 @@ int main(void)
 	DPRINTF("Stage 2 says hello (load base = %p, end = %p) (version = %08X)\n", &_start, &__self_end, MAKE_VERSION(COBRA_VERSION, FIRMWARE_VERSION, IS_CFW));
 #endif
 
-	ecdsa_set_curve();
-	ecdsa_set_pub();
+	//ecdsa_set_curve();
+	//ecdsa_set_pub();
 
 	vsh_process = get_vsh_process(); //NzV
 	if(vsh_process) get_vsh_offset();

@@ -309,8 +309,8 @@ int sys_map_paths(char *paths[], char *new_paths[], unsigned int num)
 }
 
 static uint8_t libft2d_access = 0;
-static uint8_t auto_earth = 0;
-static uint8_t earth_id = 0;
+uint8_t auto_earth = 0;
+uint8_t earth_id = 0;
 
 void clear_key(void *key)
 {

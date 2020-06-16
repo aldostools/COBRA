@@ -128,7 +128,7 @@ int sys_read_cobra_config(CobraConfig *cfg)
 	cfg = get_secure_user_ptr(cfg);
 
 	if (cfg->size > 4096)
-		return EINVAL;
+	//	return EINVAL;
 
 /*	erase_size = cfg->size-sizeof(config.size);
 	if (erase_size < 0)
@@ -154,8 +154,10 @@ int sys_write_cobra_config(CobraConfig *cfg)
 
 	cfg = get_secure_user_ptr(cfg);
 
-	if (cfg->size > 4096)
-		return EINVAL;
+	//if (cfg->size > 4096)
+	//	return EINVAL;
+
+	memcpy(&config, &cfg, sizeof(config));
 
 	check_and_correct(cfg);
 

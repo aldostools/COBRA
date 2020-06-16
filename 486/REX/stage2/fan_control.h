@@ -76,7 +76,7 @@ static void get_temperature(uint32_t id, uint32_t *temp)
 	f.toc  = (void*)MKA(TOC);
 	int(*func)(uint64_t, uint32_t, uint32_t *, uint64_t) = (void*)&f;
 	func(MKA(sysmem_obj), id, temp, 1000000);
-	*temp >>= 24; // return 째C
+	*temp >>= 24; // return 캜
 }
 
 static void fan_control(uint64_t arg0)
@@ -96,17 +96,17 @@ static void fan_control(uint64_t arg0)
 		if(t_rsx > t_cpu) t_cpu = t_rsx;
 		if(prev == t_cpu) continue;
 
-		// 60째C=31%, 61째C=33%, 62째C=35%, 63째C=37%, 64째C=39%, 65째C=41%, 66째C=43%, 67째C=45%, 68째C=47%, 69째C=49%
-		// 70째C=50%, 71째C=55%, 72째C=60%, 73째C=65%, 74째C=70%, 75째C=75%, 76째C=80%, 77째C=85%, 78째C=90%,+79째C=98%
+		// 60캜=31%, 61캜=33%, 62캜=35%, 63캜=37%, 64캜=39%, 65캜=41%, 66캜=43%, 67캜=45%, 68캜=47%, 69캜=49%
+		// 70캜=50%, 71캜=55%, 72캜=60%, 73캜=65%, 74캜=70%, 75캜=75%, 76캜=80%, 77캜=85%, 78캜=90%,+79캜=98%
 
 		if(t_cpu > 78)
 			sm_set_fan_policy(0, 2, 0xF8); // 98%
 		else if(t_cpu >= 70)
-			sm_set_fan_policy(0, 2, 0x80 + 0xD*(t_cpu - 70)); // 50% + 5% per degree 째C
+			sm_set_fan_policy(0, 2, 0x80 + 0xD*(t_cpu - 70)); // 50% + 5% per degree 캜
 		else if(t_cpu >= 60)
-			sm_set_fan_policy(0, 2, 0x50 + 0x5*(t_cpu - 60)); // 30% + 2% per degree 째C
+			sm_set_fan_policy(0, 2, 0x50 + 0x5*(t_cpu - 60)); // 30% + 2% per degree 캜
 		else
-			sm_set_fan_policy(0, 1, 0); // SYSCON < 60째C
+			sm_set_fan_policy(0, 1, 0); // SYSCON < 60캜
 
 		prev = t_cpu;
 	}
