@@ -214,8 +214,9 @@ static inline void ps3mapi_unhook_all(void)
 	//unhook_all_permissions();
 }
 
+#ifdef MAKE_RIF
 extern uint8_t skip_existing_rif; // make_rif.h
-
+#endif
 static uint64_t ps3mapi_key = 0;
 static uint8_t ps3mapi_access_tries = 0;
 static uint8_t ps3mapi_access_granted = 1;
@@ -514,10 +515,12 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 					return auto_dev_blind;
 				break;
 
+				#ifdef MAKE_RIF
 				case PS3MAPI_OPCODE_SKIP_EXISTING_RIF:
 					skip_existing_rif = (uint8_t)param2;
 					return skip_existing_rif;
 				break;
+				#endif
 
 				case PS3MAPI_OPCODE_AUTO_EARTH:
 					auto_earth = (uint8_t)param2;

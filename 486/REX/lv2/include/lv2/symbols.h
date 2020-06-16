@@ -574,7 +574,8 @@
 
 #endif /* FIRMWARE */
 
-#define DO_REACTPSN
+//#define DO_REACTPSN
+#define MAKE_RIF
 #define QA_FLAG
 #define FAN_CONTROL
 #define APPLY_KERNEL_PATCHES

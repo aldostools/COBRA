@@ -149,7 +149,7 @@ static inline int block_homebrew(const char *path)
 			}
 		}
 	}
-	#ifdef DO_REACTPSN
+	#ifdef MAKE_RIF
 	else if(is_hdd0)
 	{
 		make_rif(path);
@@ -175,7 +175,9 @@ static inline int block_homebrew(const char *path)
 				if(syscalls_disabled)
 					create_syscalls();
 
+				#ifdef MAKE_RIF
 				skip_existing_rif = 0;
+				#endif
 			}
 		}
 	}
