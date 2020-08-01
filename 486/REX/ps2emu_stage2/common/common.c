@@ -315,7 +315,7 @@ static void check_double_layer(void)
 
 	dvd_iso_read2048(buf, 0x10, 1);
 
-	if (buf[0] != 1 || memcmp(buf+1, "CD001", 5) != 0)
+	if (buf[0] != 1 || memcmp(buf + 1, "CD001", 5) != 0)
 		return;
 
 	uint32_t sector = *(uint32_t *)&buf[0x54];
@@ -325,7 +325,7 @@ static void check_double_layer(void)
 
 	dvd_iso_read2048(buf, sector, 1);
 
-	if (buf[0] != 1 || memcmp(buf+1, "CD001", 5) != 0)
+	if (buf[0] != 1 || memcmp(buf + 1, "CD001", 5) != 0)
 		return;
 
 	layer0_size = sector;
@@ -335,9 +335,6 @@ static void check_double_layer(void)
 
 static INLINE int setup_iso(void)
 {
-	int cfg_fd;
-	char *buf, *file;
-
 	int disable_chk = ufs_open(0, "/tmp/loadoptical");
 	if(disable_chk >= 0)
 	{
@@ -345,10 +342,11 @@ static INLINE int setup_iso(void)
 		return -2;
 	}
 
-	cfg_fd = ufs_open(0, CONFIG_FILE);
+	int cfg_fd = ufs_open(0, CONFIG_FILE);
 	if (cfg_fd < 0)
 		return -1;
 
+	char *buf, *file;
 	buf = get_temp_buf();
 
 	if (ufs_read(cfg_fd, 0, buf, 0x800) <= 0)
@@ -365,7 +363,7 @@ static INLINE int setup_iso(void)
 		return -1;
 	}
 
-	if(memcmp(buf + 0x702, "mount", 5)!=0)
+	if(memcmp(buf + 0x702, "mount", 5) != 0)
 	{
 		release_temp_buf();
 		ufs_close(cfg_fd);
@@ -374,7 +372,6 @@ static INLINE int setup_iso(void)
 
 	// uint8_t disable=0x00;
 	//ufs_write(cfg_fd, 0x702, &disable, 1);
-
 	file = buf + 10;
 
 	iso_fd = ufs_open(0, file);
@@ -457,8 +454,10 @@ static INLINE int process_other_cmd(uint8_t *cmd, uint8_t *out, uint64_t outlen)
 		break;
 
 		// Known unprocessed commands MODE_SENSE, MODE_SELECT, SEEK_10 and TEST_UNIT_READY only appear on the hw emu
-		case SCSI_CMD_SET_CD_SPEED: case SCSI_CMD_MODE_SENSE_10:
-		case SCSI_CMD_MODE_SELECT_10: case SCSI_CMD_TEST_UNIT_READY:
+		case SCSI_CMD_SET_CD_SPEED:
+		case SCSI_CMD_MODE_SENSE_10:
+		case SCSI_CMD_MODE_SELECT_10:
+		case SCSI_CMD_TEST_UNIT_READY:
 		case SCSI_CMD_SEEK_10:
 		break;
 
@@ -618,7 +617,6 @@ static INLINE int process_scsi_cmd_iso(uint8_t *cmd, uint8_t *out, uint64_t outl
 			break;
 		}
 
-
 		case SCSI_CMD_READ_2064:
 		{
 			ScsiRead2064 *read2064 = (ScsiRead2064 *)cmd;
@@ -742,7 +740,6 @@ static INLINE int post_process_scsi_cmd_optical(uint8_t *cmd, uint8_t *out, uint
 
 			break;
 		}
-
 	}
 
 	return 0;

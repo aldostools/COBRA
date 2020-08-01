@@ -11,12 +11,12 @@
 
 #include "../../ps2emu/include/ps2emu/symbols.h"
 
-#define read_iso_size_call	0x1360B8 //
-#define fstat_iso_call		0x135FAC //
-#define open_iso_call1		0x135F70 //
-#define open_iso_call2		0x136FF4 //
+#define read_iso_size_call		0x1360B8 //
+#define fstat_iso_call			0x135FAC //
+#define open_iso_call1			0x135F70 //
+#define open_iso_call2			0x136FF4 //
 #define read_config_size_call	0x12e544
-#define open_config_call			0x12e520
+#define open_config_call		0x12e520
 #define decrypt_config_call		0x12e578
 //#define savedata_patch		0x11B034 //
 

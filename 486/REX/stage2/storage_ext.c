@@ -123,9 +123,10 @@ static event_queue_t command_queue, result_queue;
 static event_port_t proxy_command_port;
 static event_queue_t proxy_result_queue;
 
+
+int disc_emulation = EMU_OFF;
 static int discfd = UNDEFINED;
-static int disc_emulation;
-static int total_emulation;
+static int total_emulation = 0;
 static int skip_emu_check = 0;
 static volatile int loop = 0;
 static DiscFile *discfile;

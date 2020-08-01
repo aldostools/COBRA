@@ -112,12 +112,12 @@ PS2EMU_HOOKED_FUNCTION_COND_POSTCALL_4(int, ufs_read_patched, (int fd, uint64_t 
 
 PS2EMU_PATCHED_FUNCTION(int, open_iso, (int unk, char *path))
 {
-/*uint64_t val;
-for(uint64_t i=0;i<0x50;i+=8)
-{
-val = dump_ram(0x3174478ULL+i);
-int dump = ufs_open(0, "/tmp/dump");
-ufs_write(dump, 1, (void *)val, 8);
+/*	uint64_t val;
+	for(uint64_t i=0;i<0x50;i+=8)
+	{
+	val = dump_ram(0x3174478ULL+i);
+	int dump = ufs_open(0, "/tmp/dump");
+	ufs_write(dump, 1, (void *)val, 8);
 }*/
 	if (!vars->setup_done)
 	{
