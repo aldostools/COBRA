@@ -87,8 +87,20 @@
 
 #define MAKE_VERSION(cobra, fw, type) ((cobra&0xFF) | ((fw&0xffff)<<8) | ((type&0x1)<<24))
 
+static void enable_cobra_stage2(void)
+{
+	#if defined (FIRMWARE_4_84) || defined (FIRMWARE_4_85) || defined (FIRMWARE_4_86)
+	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
+	cellFsRename(CB_LOCATION ".bak", CB_LOCATION);
+	cellFsUtilUmount("/dev_blind", 0, 1);
+	#elif defined (FIRMWARE_4_84DEX) || defined (FIRMWARE_4_85DEX) || defined (FIRMWARE_4_86DEX)
+	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
+	cellFsRename(CB_LOCATION_DEX ".bak", CB_LOCATION_DEX);
+	cellFsUtilUmount("/dev_blind", 0, 1);
+	#endif
+}
 
-int disable_cobra_stage()
+static int disable_cobra_stage2(void)
 {
 	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
 	cellFsRename(CB_LOCATION, CB_LOCATION".bak");
@@ -99,8 +111,9 @@ int disable_cobra_stage()
 
 	return SUCCEEDED;
 }
+
 /*
-int disable_cobra_stage()
+int disable_cobra_stage2(void)
 {
 	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
 	CellFsStat stat, stat_DEX; // For CEX and DEX stages
@@ -819,7 +832,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		case SYSCALL8_OPCODE_DISABLE_COBRA_STAGE:
-			return disable_cobra_stage();
+			return disable_cobra_stage2();
 		break;
 
 		case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
@@ -952,6 +965,7 @@ int main(void)
 #endif
 
 	map_path("/app_home", "/dev_usb000", 0); //Not needed
+	enable_cobra_stage2(); // on success
 
-	return 0;
+	return SUCCEEDED;
 }

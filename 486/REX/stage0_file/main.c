@@ -8,9 +8,17 @@
 
 #if defined (FIRMWARE_4_84) || defined (FIRMWARE_4_85) || defined (FIRMWARE_4_86)
 	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.cex"
+	#define STAGE2_FAIL	"/dev_blind/rebug/cobra/stage2.cex"
 #elif defined (FIRMWARE_4_84DEX) || defined (FIRMWARE_4_85DEX) || defined (FIRMWARE_4_86DEX)
 	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.dex"
+	#define STAGE2_FAIL	"/dev_blind/rebug/cobra/stage2.dex"
 #endif
+
+static void disable_cobra_stage2(void)
+{
+	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
+	cellFsRename(STAGE2_FAIL, STAGE2_FAIL ".bak");
+}
 
 void main(void)
 {
@@ -54,6 +62,9 @@ void main(void)
 
 	if (stage2)
 	{
+		// stage2 fail save by bguerville / AV
+		disable_cobra_stage2();
+
 		f.addr = stage2;
 	}
 	else
@@ -63,5 +74,4 @@ void main(void)
 
 	func = (void *)&f;
 	func();
-
 }
