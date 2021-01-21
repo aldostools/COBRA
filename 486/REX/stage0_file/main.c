@@ -6,18 +6,31 @@
 #include <lv2/patch.h>
 #include <lv1/lv1.h>
 
+// NOTE: stage0 payload size cannot exceed 0x5A8 (1448 bytes)
+
 #if defined (FIRMWARE_4_84) || defined (FIRMWARE_4_85) || defined (FIRMWARE_4_86)
-	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.cex"
-	#define STAGE2_FAIL	"/dev_blind/rebug/cobra/stage2.cex"
+	#define STAGE2_FILE		"/dev_flash/rebug/cobra/stage2.cex"
+	#define STAGE2_FAIL		"/dev_blind/rebug/cobra/stage2.cex"
 #elif defined (FIRMWARE_4_84DEX) || defined (FIRMWARE_4_85DEX) || defined (FIRMWARE_4_86DEX)
-	#define STAGE2_FILE	"/dev_flash/rebug/cobra/stage2.dex"
-	#define STAGE2_FAIL	"/dev_blind/rebug/cobra/stage2.dex"
+	#define STAGE2_FILE		"/dev_flash/rebug/cobra/stage2.dex"
+	#define STAGE2_FAIL		"/dev_blind/rebug/cobra/stage2.dex"
 #endif
 
-static void disable_cobra_stage2(void)
+#define WFLASH_MOUNT_POINT	"/dev_blind"
+#define STAGE2_FAILSAFE		"/dev_flash/rebug/cobra/failsafe"
+#define STAGE2_BIN_SIZE		96040
+
+#define FAILED				-1
+#define CELL_FS_SUCCEEDED	0
+
+static int disable_cobra_stage2(void)
 {
-	cellFsUtilMount_h("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", "/dev_blind", 0, 0, 0, 0, 0);
-	cellFsRename(STAGE2_FAIL, STAGE2_FAIL ".bak");
+	if(cellFsUtilMount("CELL_FS_IOS:BUILTIN_FLSH1", "CELL_FS_FAT", WFLASH_MOUNT_POINT, 0, 0, 0, 0, 0) == CELL_FS_SUCCEEDED)
+	{
+		return cellFsRename(STAGE2_FAIL, STAGE2_FAIL ".bak");
+		//cellFsUtilUmount(WFLASH_MOUNT_POINT, 0, 0); // /dev_blind is unmounted in stage2
+	}
+	return FAILED;
 }
 
 void main(void)
@@ -30,46 +43,57 @@ void main(void)
 	CellFsStat stat;
 	int fd;
 	uint64_t rs;
+	uint32_t payload_size = 0;
 
 	for (int i = 0; i < 128; i++)
 	{
 		uint64_t pte0 = *(uint64_t *)(MKA(0xf000000 | (i<<7)));
-		uint64_t pte1 = *(uint64_t *)(MKA(0xf000000 | ((i<<7)+8)));
+		uint64_t pte1 = *(uint64_t *)(MKA(0xf000008 | (i<<7)));
 
 		lv1_write_htab_entry(0, i << 3, pte0, (pte1 & 0xff0000) | 0x190);
 	}
 
-	if (cellFsStat(STAGE2_FILE, &stat) == 0)
+	if (cellFsStat(STAGE2_FILE, &stat) == CELL_FS_SUCCEEDED)
 	{
-		if (cellFsOpen(STAGE2_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == 0)
+		if (cellFsOpen(STAGE2_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == CELL_FS_SUCCEEDED)
 		{
-			stage2 = alloc(stat.st_size, 0x27);
+			payload_size = stat.st_size;
+
+			stage2 = alloc(payload_size, 0x27);
 			if (stage2)
 			{
-				if (cellFsRead(fd, stage2, stat.st_size, &rs) != 0)
+				if (cellFsRead(fd, stage2, payload_size, &rs) != CELL_FS_SUCCEEDED)
 				{
 					dealloc(stage2, 0x27);
 					stage2 = NULL;
 				}
-
 			}
 
 			cellFsClose(fd);
 		}
 	}
 
-	f.toc = (void *)MKA(TOC);
+	f.toc  = (void *)MKA(TOC);
+	f.addr = (void *)MKA(0x17e0);
 
 	if (stage2)
 	{
-		// stage2 fail save by bguerville / AV
-		disable_cobra_stage2();
-
-		f.addr = stage2;
-	}
-	else
-	{
-		f.addr=(void *)MKA(0x17e0);
+		#if 0
+		// force failsafe
+		if (cellFsStat(STAGE2_FAILSAFE, &stat) == CELL_FS_SUCCEEDED)
+		{
+			payload_size = 0;
+		}
+		// stage2 failsafe by bguerville / AV
+		if(payload_size != STAGE2_BIN_SIZE)
+		{
+			if(disable_cobra_stage2() == CELL_FS_SUCCEEDED) f.addr = stage2;
+		}
+		else
+			f.addr = stage2;
+		#else
+		if(disable_cobra_stage2() == CELL_FS_SUCCEEDED) f.addr = stage2;
+		#endif
 	}
 
 	func = (void *)&f;
