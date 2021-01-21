@@ -154,7 +154,7 @@ static SprxPatch explore_plugin_patches[] =
 	{ ps2_nonbw_offset, LI(0, 1), &condition_ps2softemu },
 	//// Devil303's What's New ///
 #if defined(whatsnew_offset)
-	{ whatsnew_offset,        0x68747470, &condition_true },
+	{ whatsnew_offset,		0x68747470, &condition_true },
 	{ whatsnew_offset + 0x04, 0x3A2F2F77, &condition_true },
 	{ whatsnew_offset + 0x08, 0x77772E78, &condition_true },
 	{ whatsnew_offset + 0x0C, 0x6D626D6F, &condition_true },
@@ -218,17 +218,17 @@ static SprxPatch bdp_bdvd_patches[] =
 #if defined(elf_patch1_download) && defined(elf_patch2_download) && defined(elf_patch3_download) && defined(elf_patch4_download) && defined(elf_patch6_download)
 static SprxPatch download_plugin_patches[] =
 {
-	{elf_patch1_download,        0x409C017C, &condition_true},
-	{elf_patch2_download,        0x48000010, &condition_true},
+	{elf_patch1_download,		0x409C017C, &condition_true},
+	{elf_patch2_download,		0x48000010, &condition_true},
 	// Devil303's extended download plugin patches
-	{elf_patch3_download,        0x78000000, &condition_true},
+	{elf_patch3_download,		0x78000000, &condition_true},
 	{elf_patch3_download + 0x9A, 0x78000000, &condition_true}, // allow XML files to be downloaded
-	{elf_patch4_download,        0x78787800, &condition_true},
-//	{elf_patch5_download,        0x00000000, &condition_true}, // patches /tmp & /downloader
+	{elf_patch4_download,		0x78787800, &condition_true},
+//	{elf_patch5_download,		0x00000000, &condition_true}, // patches /tmp & /downloader
 //	{elf_patch5_download + 8,    0x00000000, &condition_true}, //
 //	{elf_patch5_download + 0x0C, 0x00000000, &condition_true}, //
 //	{elf_patch5_download + 0x10, 0x00000000, &condition_true}, //
-	{elf_patch6_download,        0x6F637465, &condition_true},
+	{elf_patch6_download,		0x6F637465, &condition_true},
 	{elf_patch6_download + 0x04, 0x742D7374, &condition_true},
 	{elf_patch6_download + 0x08, 0x7265616D, &condition_true},
 	{elf_patch6_download + 0x48, 0x6F637465, &condition_true},
@@ -262,7 +262,7 @@ static SprxPatch premo_game_plugin_patches[] =
 #if (defined(LIBAUDIO_HASH) && defined(bt_usb_audio_offset))
 static SprxPatch libaudio_patches[] =
 {
-	{ bt_usb_audio_offset,        0x38000001, &condition_true },
+	{ bt_usb_audio_offset,		0x38000001, &condition_true },
 	{ bt_usb_audio_offset + 4,    0xF81E0010, &condition_true },
 	{ bt_usb_audio_offset + 8,    0xE8030000, &condition_true },
 	{ bt_usb_audio_offset + 0x0C, 0x2FA00000, &condition_true },
@@ -1345,26 +1345,26 @@ void load_boot_plugins(void)
 		char path_prx[128];
 
 		// Default plugin's paths in some CFW
-		char webman_paths[4][60] =
+		const char *webman_paths[4] =
 		{
-        	"/dev_flash/vsh/module/webftp_server.sprx",
-        	"/dev_flash/ps3ita/webftp_server.sprx",
-        	"/dev_flash/webman/webftp_server.sprx",
-        	"/dev_flash/dragon/web.sprx",
-    	};
+			"/dev_flash/vsh/module/webftp_server.sprx",
+			"/dev_flash/ps3ita/webftp_server.sprx",
+			"/dev_flash/webman/webftp_server.sprx",
+			"/dev_flash/dragon/web.sprx",
+		};
 
-    	// Copy "/dev_flash/vsh/module/webftp_server.sprx" as default path
-    	strcpy(path_prx, webman_paths[0]);
+		// Copy "/dev_flash/vsh/module/webftp_server.sprx" as default path
+		strcpy(path_prx, webman_paths[0]);
 
-    	// Let's find the plugin
+		// Let's find the plugin
 		for(int i = 0; i < 4; i++)
 	    {
-	        if(cellFsStat(webman_paths[i], &stat) == 0)
-	        {
-	            strcpy(path_prx, webman_paths[i]);
-	            break;
-	        }
-	    }
+			if(cellFsStat(webman_paths[i], &stat) == 0)
+			{
+			    strcpy(path_prx, webman_paths[i]);
+			    break;
+			}
+		}
 
 		if (prx_load_vsh_plugin(current_slot, path_prx, NULL, 0) >= 0)
 			DPRINTF("Loading integrated webMAN plugin into slot %x\n", current_slot);
@@ -1375,7 +1375,7 @@ void load_boot_plugins(void)
 #ifdef DEBUG
 LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, create_process_common_hooked, (process_t parent, uint32_t *pid, int fd, char *path, int r7, uint64_t r8,
 									  uint64_t r9, void *argp, uint64_t args, void *argp_user, uint64_t sp_80,
-									 void **sp_88, uint64_t *sp_90, process_t *process, uint64_t *sp_A0,
+									  void **sp_88, uint64_t *sp_90, process_t *process, uint64_t *sp_A0,
 									  uint64_t *sp_A8))
 {
 	char *parent_name = get_process_name(parent);
@@ -1386,7 +1386,7 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, create_process_common_hooked, (proces
 
 LV2_HOOKED_FUNCTION_POSTCALL_8(void, create_process_common_hooked_pre, (process_t parent, uint32_t *pid, int fd, char *path, int r7, uint64_t r8,
 									  uint64_t r9, void *argp, uint64_t args, void *argp_user, uint64_t sp_80,
-									 void **sp_88, uint64_t *sp_90, process_t *process, uint64_t *sp_A0,
+									  void **sp_88, uint64_t *sp_90, process_t *process, uint64_t *sp_A0,
 									  uint64_t *sp_A8))
 {
 

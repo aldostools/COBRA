@@ -72,6 +72,10 @@ One of those great debugging features.
 * Partial disable syscall8 and unhooks all cobra hooks (Part of PS3MAPI)
 * Block update from disc
 
+[ Bguerville's changes ]
+
+* Failsafe code in stage0 to prevent load of stage2 if previous load didn't succeeded
+
 [ Aldo's changes ]
 
 * Improved PSX media type support, now it supports following disc types

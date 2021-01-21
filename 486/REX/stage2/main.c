@@ -223,7 +223,7 @@ static inline void ps3mapi_unhook_all(void)
 	unhook_all_modules();
 	unhook_all_region();
 	unhook_all_map_path();
-    unhook_all_storage_ext();
+	unhook_all_storage_ext();
 	//unhook_all_permissions();
 }
 
@@ -237,8 +237,8 @@ static uint8_t ps3mapi_access_granted = 1;
 static int ps3mapi_partial_disable_syscall8 = 0;
 static uint8_t disable_cobra = 0;
 
-uint64_t LV2_OFFSET_ON_LV1 = 0; // 0x1000000 on 4.46, 0x8000000 on 4.76
-uint64_t lv2_offset = 0;
+static uint64_t LV2_OFFSET_ON_LV1 = 0; // 0x1000000 on 4.46, 0x8000000 on 4.76
+
 LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t param2, uint64_t param3, uint64_t param4, uint64_t param5, uint64_t param6, uint64_t param7))
 {
 	extend_kstack(0);

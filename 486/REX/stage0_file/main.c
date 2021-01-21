@@ -9,19 +9,20 @@
 // NOTE: stage0 payload size cannot exceed 0x5A8 (1448 bytes)
 
 #if defined (FIRMWARE_4_84) || defined (FIRMWARE_4_85) || defined (FIRMWARE_4_86)
-	#define STAGE2_FILE		"/dev_flash/rebug/cobra/stage2.cex"
-	#define STAGE2_FAIL		"/dev_blind/rebug/cobra/stage2.cex"
+	#define STAGE2_FILE			"/dev_flash/rebug/cobra/stage2.cex"
+	#define STAGE2_FAIL			"/dev_blind/rebug/cobra/stage2.cex"
+	#define STAGE2_BIN_SIZE		95752
 #elif defined (FIRMWARE_4_84DEX) || defined (FIRMWARE_4_85DEX) || defined (FIRMWARE_4_86DEX)
-	#define STAGE2_FILE		"/dev_flash/rebug/cobra/stage2.dex"
-	#define STAGE2_FAIL		"/dev_blind/rebug/cobra/stage2.dex"
+	#define STAGE2_FILE			"/dev_flash/rebug/cobra/stage2.dex"
+	#define STAGE2_FAIL			"/dev_blind/rebug/cobra/stage2.dex"
+	#define STAGE2_BIN_SIZE		95720
 #endif
 
-#define WFLASH_MOUNT_POINT	"/dev_blind"
-#define STAGE2_FAILSAFE		"/dev_flash/rebug/cobra/failsafe"
-#define STAGE2_BIN_SIZE		96040
+#define WFLASH_MOUNT_POINT		"/dev_blind"
+#define STAGE2_FAILSAFE			"/dev_flash/rebug/cobra/failsafe"
 
-#define FAILED				-1
-#define CELL_FS_SUCCEEDED	0
+#define FAILED					-1
+#define CELL_FS_SUCCEEDED		0
 
 static int disable_cobra_stage2(void)
 {
@@ -78,20 +79,22 @@ void main(void)
 
 	if (stage2)
 	{
-		#if 0
-		// force failsafe
+		#if 1
+		// "failsafe" must be created by devs to force failsafe
+		// This increases the failsafe protection in case a modded stage2 has the same size of the original
 		if (cellFsStat(STAGE2_FAILSAFE, &stat) == CELL_FS_SUCCEEDED)
 		{
 			payload_size = 0;
 		}
-		// stage2 failsafe by bguerville / AV
 		if(payload_size != STAGE2_BIN_SIZE)
 		{
+			// stage2 failsafe by bguerville / AV
 			if(disable_cobra_stage2() == CELL_FS_SUCCEEDED) f.addr = stage2;
 		}
 		else
 			f.addr = stage2;
 		#else
+		// stage2 failsafe by bguerville / AV
 		if(disable_cobra_stage2() == CELL_FS_SUCCEEDED) f.addr = stage2;
 		#endif
 	}
