@@ -489,12 +489,12 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_PCHECK_SYSCALL8:
 					return ps3mapi_partial_disable_syscall8;
 				break;
-// 8.2
+// 8.3
 				case PS3MAPI_OPCODE_CREATE_CFW_SYSCALLS:
 					create_syscalls();
 					return SUCCEEDED;
 				break;
-				case PS3MAPI_OPCODE_ALLOW_CREATE_SYSCALLS:
+				case PS3MAPI_OPCODE_ALLOW_RESTORE_SYSCALLS:
 					allow_restore_sc = (uint8_t)param2; // 1 = allow, 0 = do not allow
 					return SUCCEEDED;
 				break;
@@ -521,7 +521,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_SET_PSID:
 					return ps3mapi_set_psid(param2, param3);
 				break;
-// 8.2
+// 8.3
 				//----------
 				//MISC
 				//----------

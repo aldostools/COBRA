@@ -11,11 +11,11 @@
 #if defined (FIRMWARE_4_84) || defined (FIRMWARE_4_85) || defined (FIRMWARE_4_86) || defined (FIRMWARE_4_87)
 	#define STAGE2_FILE			"/dev_flash/rebug/cobra/stage2.cex"
 	#define STAGE2_FAIL			"/dev_blind/rebug/cobra/stage2.cex"
-	#define STAGE2_BIN_SIZE		96208
+	#define STAGE2_BIN_SIZE		96104
 #elif defined (FIRMWARE_4_84DEX) || defined (FIRMWARE_4_85DEX) || defined (FIRMWARE_4_86DEX) || defined (FIRMWARE_4_87DEX)
 	#define STAGE2_FILE			"/dev_flash/rebug/cobra/stage2.dex"
 	#define STAGE2_FAIL			"/dev_blind/rebug/cobra/stage2.dex"
-	#define STAGE2_BIN_SIZE		96208
+	#define STAGE2_BIN_SIZE		96072
 #endif
 
 #define WFLASH_MOUNT_POINT		"/dev_blind"

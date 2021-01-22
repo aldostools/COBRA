@@ -3,6 +3,7 @@
 * REBUG 4.84.2 REX/D-REX (REX) (Untested!!!)
 * REBUG 4.85.1 LITE (Untested!!!)
 * REBUG 4.86.1 LITE (Untested!!!)
+* CFW 4.87 (Untested!!!)
 
 COBRA 8.3 Source
 

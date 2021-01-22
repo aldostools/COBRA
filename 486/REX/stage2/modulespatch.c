@@ -1341,9 +1341,6 @@ void load_boot_plugins(void)
 
 	if(!webman_loaded)
 	{
-		CellFsStat stat;
-		char path_prx[128];
-
 		// Default plugin's paths in some CFW
 		const char *webman_paths[4] =
 		{
@@ -1353,20 +1350,19 @@ void load_boot_plugins(void)
 			"/dev_flash/dragon/web.sprx",
 		};
 
-		// Copy "/dev_flash/vsh/module/webftp_server.sprx" as default path
-		strcpy(path_prx, webman_paths[0]);
+		CellFsStat stat;
+		int i;
 
 		// Let's find the plugin
-		for(int i = 0; i < 4; i++)
-	    {
-			if(cellFsStat(webman_paths[i], &stat) == 0)
+		for(i = 0; i < 4; i++)
+		{
+			if(cellFsStat(webman_paths[i], &stat) == SUCCEEDED)
 			{
-			    strcpy(path_prx, webman_paths[i]);
-			    break;
+				break;
 			}
 		}
 
-		if (prx_load_vsh_plugin(current_slot, path_prx, NULL, 0) >= 0)
+		if (prx_load_vsh_plugin(current_slot, (char*)webman_paths[i], NULL, 0) >= 0)
 			DPRINTF("Loading integrated webMAN plugin into slot %x\n", current_slot);
 	}
 	// EVILNAT END
