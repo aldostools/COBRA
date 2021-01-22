@@ -4,7 +4,7 @@
 #include <lv2/process.h>
 #include <lv2/thread.h>
 
-#if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_85DEX) || defined(FIRMWARE_4_86) || defined(FIRMWARE_4_86DEX)
+#if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_85DEX) || defined(FIRMWARE_4_86) || defined(FIRMWARE_4_86DEX) || defined(FIRMWARE_4_87) || defined(FIRMWARE_4_87DEX)
 
 #define VSH_DEX_HASH					0xb6b6d000002e6000 // 0xb6b6d000002e6000
 #define VSH_CEX_HASH					0xb6b6d000002e0000 // 0xb6b6d000002e3000
