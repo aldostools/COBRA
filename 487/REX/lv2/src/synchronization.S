@@ -35,5 +35,3 @@ LV2_FUNCTION(event_queue_create, event_queue_create_symbol)
 LV2_FUNCTION(event_queue_destroy, event_queue_destroy_symbol)
 LV2_FUNCTION(event_queue_receive, event_queue_receive_symbol)
 LV2_FUNCTION(event_queue_tryreceive, event_queue_tryreceive_symbol)
-
-

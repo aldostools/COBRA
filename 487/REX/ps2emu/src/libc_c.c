@@ -14,20 +14,26 @@ int strcmp(const char *s1, const char *s2)
 int strncmp(const char *s1, const char *s2, size_t n)
 {
 	unsigned char uc1, uc2;
+
 	/* Nothing to compare?  Return zero.  */
 	if (n == 0)
 		return 0;
+
 	/* Loop, comparing bytes.  */
-	while (n-- > 0 && *s1 == *s2) {
+	while (n-- > 0 && *s1 == *s2) 
+	{
 		/* If we've run out of bytes or hit a null, return zero
 		since we already know *s1 == *s2.  */
 		if (n == 0 || *s1 == '\0')
 			return 0;
+
 		s1++;
 		s2++;
 	}
+
 	uc1 = (*(unsigned char *) s1);
 	uc2 = (*(unsigned char *) s2);
+
 	return ((uc1 < uc2) ? -1 : (uc1 > uc2));
 }
 
@@ -59,11 +65,13 @@ char *strchr(const char *s, int c)
 char *strstr(const char *haystack, const char *needle)
 {
 	size_t needlelen;
+
 	/* Check for the null needle case.  */
 	if (*needle == '\0')
 		return (char *) haystack;
      
 	needlelen = strlen(needle);
+
 	for (; (haystack = strchr(haystack, *needle)) != NULL; haystack++)
 		if (strncmp(haystack, needle, needlelen) == 0)
 			return (char *) haystack;

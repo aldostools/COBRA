@@ -10,9 +10,3 @@ PS2EMU_FUNCTION(ufs_write, ufs_write_symbol)
 #ifdef ufs_fstat_symbol
 PS2EMU_FUNCTION(ufs_fstat, ufs_fstat_symbol)
 #endif
-
-
-
-
-
-

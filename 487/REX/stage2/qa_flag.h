@@ -127,7 +127,9 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_5(int,um_if_get_token,(u8 *token,uint32_t toke
 		/// 2.1.2 QA flag - hmac hash check - START
 		hmac_sha1(hmac, 0x40, seed, 60, seed + 60);
 		aescbccfb_enc(token,  seed, token_size, erk, 0x100, iv_qa);
+		#ifdef DEBUG
 		DPRINT_HEX_C(seed, 60);
+		#endif
 		/// 2.1.2 QA flag - hmac hash check - END
 		return 0;
 	}

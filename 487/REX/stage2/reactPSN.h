@@ -583,7 +583,9 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_4(int,sys_fs_read,(int fd, void *buf, uint64
 {
 	uint16_t gen_ecdsa = 0;
 
-	if(rif_fd == fd)
+	if(!buf) ;
+
+	else if(rif_fd == fd)
 	{
 		if(*nread == 0x98)
 		{
@@ -625,7 +627,7 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_4(int,sys_fs_read,(int fd, void *buf, uint64
 		u8 *buffer = (u8 *)buf;
 		uint16_t bsize  = gen_ecdsa - 0x28;
 
-		u8 sha1_digest[20];
+		u8 sha1_digest[0x15];
 		sha1(buffer, bsize, sha1_digest);
 
 		u8 R[0x15];

@@ -13,6 +13,3 @@ void spin_unlock_irqrestore(uint64_t restore)
 	uint8_t *ta = (uint8_t *)get_current_thread();
 	spin_unlock_irqrestore_ex(ta+0x28, restore, 0);
 }
-
-
-

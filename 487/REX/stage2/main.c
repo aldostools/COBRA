@@ -214,11 +214,19 @@ LV2_HOOKED_FUNCTION(uint64_t, sys_cfw_storage_send_device_command, (uint32_t dev
 
 extern f_desc_t open_path_callback;
 
+#ifdef DO_AUTO_MOUNT_DEV_BLIND
 extern uint8_t auto_dev_blind;		// homebrew_blocker.h
+#endif
+#ifdef DO_AUTO_RESTORE_SC
 extern uint8_t allow_restore_sc;	// homebrew_blocker.h
+#endif
+#ifdef DO_PHOTO_GUI
 extern uint8_t photo_gui;			// mappath.c
+#endif
+#ifdef DO_AUTO_EARTH
 extern uint8_t auto_earth;			// mappath.c
 extern uint8_t earth_id;			// mappath.c
+#endif
 
 static inline void ps3mapi_unhook_all(void)
 {
@@ -226,6 +234,9 @@ static inline void ps3mapi_unhook_all(void)
 	unhook_all_region();
 	unhook_all_map_path();
 	unhook_all_storage_ext();
+	#ifdef FAN_CONTROL
+	unhook_all_fan_patches();
+	#endif
 	//unhook_all_permissions();
 }
 
@@ -494,10 +505,12 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 					create_syscalls();
 					return SUCCEEDED;
 				break;
+				#ifdef DO_AUTO_RESTORE_SC
 				case PS3MAPI_OPCODE_ALLOW_RESTORE_SYSCALLS:
 					allow_restore_sc = (uint8_t)param2; // 1 = allow, 0 = do not allow
 					return SUCCEEDED;
 				break;
+				#endif
 				//----------
 				//REMOVE HOOK
 				//----------
@@ -525,10 +538,12 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				//----------
 				//MISC
 				//----------
+				#ifdef DO_AUTO_MOUNT_DEV_BLIND
 				case PS3MAPI_OPCODE_AUTO_DEV_BLIND:
 					auto_dev_blind = (uint8_t)param2;
 					return auto_dev_blind;
 				break;
+				#endif
 
 				#ifdef MAKE_RIF
 				case PS3MAPI_OPCODE_SKIP_EXISTING_RIF:
@@ -537,16 +552,20 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				break;
 				#endif
 
+				#ifdef DO_AUTO_EARTH
 				case PS3MAPI_OPCODE_AUTO_EARTH:
 					auto_earth = (uint8_t)param2;
 					earth_id   = (uint8_t)param3;
 					return auto_earth;
 				break;
+				#endif
 
+				#ifdef DO_PHOTO_GUI
 				case PS3MAPI_OPCODE_PHOTO_GUI:
 					photo_gui = (uint8_t)param2;
 					return photo_gui;
 				break;
+				#endif
 
 				#ifdef FAN_CONTROL
 				case PS3MAPI_OPCODE_SET_FAN_SPEED:
@@ -562,6 +581,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 					return sm_get_fan_speed();
 				break;
 				#endif
+
 				//----------
 				//DEFAULT
 				//----------
@@ -906,10 +926,6 @@ void create_syscalls(void)
 	create_syscall2(10, sys_cfw_lv1_call);
 	create_syscall2(11, sys_cfw_lv1_peek);
 	create_syscall2(15, sys_cfw_lv2_func);
-	#ifdef FAN_CONTROL
-	create_syscall2(389, sm_set_fan_policy_sc);
-	create_syscall2(409, sm_get_fan_policy_sc);
-	#endif
 }
 
 int main(void)
@@ -936,6 +952,9 @@ int main(void)
 	storage_ext_patches();
 	region_patches();
 	permissions_patches();
+	#ifdef FAN_CONTROL
+	fan_patches();
+	#endif
 
 	#ifdef DO_PATCH_PS2
 	ps2_vsh_patches();

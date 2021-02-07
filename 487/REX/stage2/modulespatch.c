@@ -761,7 +761,7 @@ LV2_PATCHED_FUNCTION(int, modules_patching, (uint64_t *arg1, uint32_t *arg2))
 				int j = 0;
 				SprxPatch *patch = &patch_table[i].patch_table[j];
 
-				while (patch->offset != 0)
+				while (patch->offset)
 				{
 					if (*patch->condition)
 					{
@@ -1000,13 +1000,13 @@ int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_s
 	if (slot >= MAX_VSH_PLUGINS || (arg != NULL && arg_size > KB(64)))
 		return EINVAL;
 
-	if (vsh_plugins[slot] != 0)
+	if (vsh_plugins[slot])
 		return EKRESOURCE;
 
 	CellFsStat stat;
-	if (cellFsStat(path, &stat) != 0 || stat.st_size < 0x230) return EINVAL; // prevent a semi-brick (black screen on start up) if the sprx is 0 bytes (due a bad ftp transfer).
+	if (cellFsStat(path, &stat) != CELL_FS_SUCCEEDED || stat.st_size < 0x230) return EINVAL; // prevent a semi-brick (black screen on start up) if the sprx is 0 bytes (due a bad ftp transfer).
 	int file;
-	if (cellFsOpen(path, CELL_FS_O_RDONLY, &file, 0, NULL, 0) == SUCCEEDED)
+	if (cellFsOpen(path, CELL_FS_O_RDONLY, &file, 0, NULL, 0) == CELL_FS_SUCCEEDED)
 	{
 		uint64_t nread;
 		uint8_t sprx_check[0x20];
@@ -1064,31 +1064,6 @@ int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_s
 
 	return ret;
 
-}
-
-
-// load system modules by haxxxen
-int prx_start_modules(sys_prx_id_t id, process_t process, uint64_t flags, uint64_t arg)
-{
-	int ret;
-	uint64_t meminfo[5];
-	uint32_t toc[2];
-
-	meminfo[0] = sizeof(meminfo);
-	meminfo[1] = 1;
-
-	ret = prx_start_module(id, process, flags, meminfo);
-	if (ret != 0)
-		return ret;
-
-	ret = copy_from_process(process, (void *)meminfo[2], toc, sizeof(toc));
-	if (ret != 0)
-		return ret;
-
-	meminfo[1] = 2;
-	meminfo[3] = 0;
-
-	return prx_start_module(id, process, flags, meminfo);
 }
 
 // User version of prx_load_vsh_plugin
@@ -1166,7 +1141,7 @@ int read_text_line(int fd, char *line, unsigned int size, int *eof)
 		uint8_t ch;
 		uint64_t r;
 
-		if ((cellFsRead(fd, &ch, 1, &r) != SUCCEEDED) || (r != 1))
+		if ((cellFsRead(fd, &ch, 1, &r) != CELL_FS_SUCCEEDED) || (r != 1))
 		{
 			*eof = 1;
 			break;
@@ -1259,7 +1234,7 @@ void load_boot_plugins_kernel(void)
 	if (!vsh_process)
 		return;	  // lets wait till vsh so we dont brick the console perma!
 
-	if (cellFsOpen(BOOT_PLUGINS_KERNEL_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == 0)
+	if (cellFsOpen(BOOT_PLUGINS_KERNEL_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == CELL_FS_SUCCEEDED)
 	{
 		while (num_loaded_kernel < MAX_BOOT_PLUGINS_KERNEL)
 		{
@@ -1310,7 +1285,7 @@ void load_boot_plugins(void)
 	// Improving initial KW's code
 	// Firstly will load plugin from '/dev_hdd0' instead '/dev_flash'
 	// If it does not exist in '/dev_hdd0' will load it from '/dev_flash'
-	if (cellFsOpen(BOOT_PLUGINS_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == 0)
+	if (cellFsOpen(BOOT_PLUGINS_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == CELL_FS_SUCCEEDED)
 	{
 		while (num_loaded < MAX_BOOT_PLUGINS)
 		{

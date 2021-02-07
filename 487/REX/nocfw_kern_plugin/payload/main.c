@@ -29,7 +29,7 @@
 #define MAX_BOOT_PLUGINS			(MAX_VSH_PLUGINS-BOOT_PLUGINS_FIRST_SLOT)
 #define MAX_BOOT_PLUGINS_KERNEL		5
 
-#define PS2EMU_STAGE2_FILE	"/dev_hdd0/vm/pm0"
+#define PS2EMU_STAGE2_FILE			"/dev_hdd0/vm/pm0"
 
 process_t vsh_process;
 sys_prx_id_t vsh_plugins[MAX_VSH_PLUGINS];
@@ -96,33 +96,34 @@ uint64_t load_plugin_kernel(char *path)
 	int file;
 	int (* func)(void);
 	uint64_t read;
-	if(cellFsStat(path, &stat)==0)
+
+	if(cellFsStat(path, &stat) == 0)
 	{
-		if(stat.st_size>4)
+		if(stat.st_size > 4)
 		{
-			if(cellFsOpen(path, CELL_FS_O_RDONLY, &file, 0, NULL, 0)==0)
+			if(cellFsOpen(path, CELL_FS_O_RDONLY, &file, 0, NULL, 0) == 0)
 			{
-				void *skprx = alloc(stat.st_size,0x27);
+				void *skprx = alloc(stat.st_size, 0x27);
 				if(skprx)
 				{
-					if(cellFsRead(file, skprx, stat.st_size, &read)==0)
+					if(cellFsRead(file, skprx, stat.st_size, &read) == 0)
 					{
 						f_desc_t f;
 						f.addr = skprx;
 						f.toc = (void *)MKA(TOC);
-						func=(void *)&f;
+						func = (void *)&f;
 						func();
-						uint64_t resident=(uint64_t)skprx;
+						uint64_t resident = (uint64_t)skprx;
+
 						return resident;
 					}
 					else
-					{
 						dealloc(skprx, 0x27);
-					}
 				}
 			}
 		}
 	}
+
 	return -1;
 }
 
@@ -161,7 +162,7 @@ void load_boot_plugins_kernel(void)
 int prx_load_vsh_plugin(unsigned int slot, char *path)
 {
 	sys_prx_id_t prx;
-	int ret=-1;
+	int ret = -1;
 
 	if (slot >= MAX_VSH_PLUGINS)
 		return ret;
@@ -175,7 +176,6 @@ int prx_load_vsh_plugin(unsigned int slot, char *path)
 
 	if (prx < 0)
 		return prx;
-
 
 	ret = prx_start_module_with_thread(prx, vsh_process, 0, 0);
 
@@ -238,9 +238,9 @@ static INLINE int get_ps2emu_type(void)
 
 	lv1_get_repository_node_value(PS3_LPAR_ID_PME, FIELD_FIRST("sys", 0), FIELD("hw", 0), FIELD("config", 0), 0, (u64 *)config, &v2);
 
-	if (config[6]&1) // has emotion engine
+	if (config[6] & 1) // has emotion engine
 		return PS2EMU_HW;
-	else if (config[0]&0x20) // has graphics synthesizer
+	else if (config[0] & 0x20) // has graphics synthesizer
 		return PS2EMU_GX;
 
 	return PS2EMU_SW;
@@ -280,11 +280,11 @@ void copy_emus(int emu_type)
 
 		for(int i = 0; i < 2; i++)
 		{
-			if(cellFsOpen(ps2_files[i], CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0)==0)
+			if(cellFsOpen(ps2_files[i], CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
 			{
 				cellFsWrite(dst, buf, size, &size);
 				cellFsClose(dst);
-				size=4;
+				size = 4;
 			}
 		}
 
@@ -298,6 +298,7 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 	if (strcmp(mount_point, "/dev_hdd0") == 0 && strcmp(filesystem, "CELL_FS_UFS") == 0)
 	{
 		unhook_function_on_precall_success(cellFsUtilMount_symbol, post_cellFsUtilMount, 8);
+
 		if(vsh_process)
 		{
 			copy_emus(get_ps2emu_type());
@@ -311,6 +312,7 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 		}
 
 	}
+
 	return 0;
 }
 

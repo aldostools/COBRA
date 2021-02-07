@@ -6,6 +6,8 @@
 #include <lv2/lv2.h>
 #include <lv2/symbols.h>
 
+#define CELL_FS_SUCCEEDED	0
+
 #define CELL_FS_O_CREAT		000100
 #define CELL_FS_O_EXCL		000200
 #define CELL_FS_O_TRUNC		001000
@@ -53,7 +55,7 @@ typedef int CellFsMode;
 #endif
 
 
-typedef struct 
+typedef struct
 {
 	CellFsMode st_mode;
 	int st_uid;
@@ -66,7 +68,7 @@ typedef struct
 	uint64_t dummy[1];
 } __attribute__((__packed__)) CellFsStat;
 
-typedef struct 
+typedef struct
 {
 	time_t actime;
 	time_t modtime;
@@ -94,11 +96,12 @@ LV2_EXPORT int cellFsUtime(const char *path, CellFsUtimbuf *timep);
 #ifdef io_sub_rtoc_entry_1
 
 LV2_EXPORT int cellFsRename_internal(void *structure, const char *from, const char *to, uint64_t unk);
+
 static INLINE int cellFsRename(const char *from, const char *to)
 {
-uint64_t *structure = (uint64_t *) *(uint64_t *)MKA(TOC+io_rtoc_entry_1);
-structure = (uint64_t *)structure[io_sub_rtoc_entry_1];
-return cellFsRename_internal(structure, from, to, 0);
+	uint64_t *structure = (uint64_t *) *(uint64_t *)MKA(TOC+io_rtoc_entry_1);
+	structure = (uint64_t *)structure[io_sub_rtoc_entry_1];
+	return cellFsRename_internal(structure, from, to, 0);
 }
 
 static INLINE int cellFsUnlink(const char *path)
@@ -124,4 +127,3 @@ LV2_EXPORT int open_fs_object(void *unk, char *path, void **fs_object, void **un
 LV2_EXPORT int close_fs_object(void *unk, fs_object_handle_t handle);
 
 #endif /* __LV2_IO_H__ */
-

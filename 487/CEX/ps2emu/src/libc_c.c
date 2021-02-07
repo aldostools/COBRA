@@ -44,8 +44,8 @@ int memcmp(const void *s1, const void *s2, size_t n)
 	 
 	 for (int i = 0; i < n; i++)
 	 {
-		 if (p1[i] != p2[i])		 
-			 return (p1[i] < p2[i]) ? -1 : 1;		 
+		 if (p1[i] != p2[i])
+			 return (p1[i] < p2[i]) ? -1 : 1;
 	 }
 	 
 	 return 0;
@@ -69,7 +69,7 @@ char *strstr(const char *haystack, const char *needle)
 		return (char *) haystack;
      
 	needlelen = strlen(needle);
-	
+
 	for (; (haystack = strchr(haystack, *needle)) != NULL; haystack++)
 		if (strncmp(haystack, needle, needlelen) == 0)
 			return (char *) haystack;

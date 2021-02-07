@@ -10,11 +10,11 @@
 #define MAKE_JUMP_VALUE(addr, to) ((0x12 << 26) | ((((to-(uint64_t)(addr))>>2)&0xFFFFFF) << 2))
 #define MAKE_CALL_VALUE(addr, to) ((0x12 << 26) | ((((to-(uint64_t)(addr))>>2)&0xFFFFFF) << 2)) | 1
 
-#define BLR	0x4E800020
+#define BLR		0x4E800020
 #define BLRL	0x4E800021
 #define BCTR	0x4E800420
 #define BCTRL	0x4E800421
-#define NOP	0x60000000
+#define NOP		0x60000000
 
 #define MFSPR(SPR, RS) ((31 << 26) | (RS << 21) | (SPR << 16) | (339 << 1))
 #define MFLR(RS) MFSPR(8, RS)
@@ -41,7 +41,7 @@
 #define STW(RS, D, RA) (36 << 26) | (RS << 21) | (RA << 16) | D
 
 /* DO NOT CHANGE */
-#define DO_POSTCALL		0xFFFFC561
+#define DO_POSTCALL			0xFFFFC561
 #define DO_POSTCALL_64		0xFFFFFFFFFFFFC561
 
 #define PS2EMU_PATCHED_FUNCTION	PS2EMU_CONTEXT
@@ -2198,4 +2198,3 @@ uint64_t call_hooked_function(void *func, uint64_t a1, uint64_t a2, uint64_t a3,
 
 
 #endif /* __PS2EMU_PATCH_H__ */
-

@@ -65,7 +65,7 @@ enum DvdBookType
 	BOOKTYPE_DVDPRW = 9,
 	BOOKTYPE_DVDPR,
 	BOOKTYPE_DVDPRWDL = 13,
-	BOOKTYPE_DVDPRDL	
+	BOOKTYPE_DVDPRDL
 };
 
 typedef struct _ScsiCmdTestUnitReady
@@ -75,7 +75,7 @@ typedef struct _ScsiCmdTestUnitReady
 	uint8_t control;
 } __attribute__((packed)) ScsiCmdTestUnitReady;
 
-enum 
+enum
 {
 	FORMAT_TOC,
 	FORMAT_SESSION_INFO,
@@ -93,7 +93,7 @@ typedef struct _ScsiCmdReadTocPmaAtip
 	uint8_t reserved[3];
 	uint8_t track_session_num;
 	uint16_t alloc_length;
-	uint8_t control;	
+	uint8_t control;
 } __attribute__((packed)) ScsiCmdReadTocPmaAtip;
 
 typedef struct _ScsiTocResponse
@@ -278,7 +278,7 @@ typedef struct _ScsiReadDiscStructureFormat0Response
 	uint8_t end_sector[3];
 	uint8_t zero3;
 	uint8_t end_sector_layer0[3];
-	uint8_t reserved2;	
+	uint8_t reserved2;
 } __attribute__((packed)) ScsiReadDiscStructureFormat0Response;
 
 typedef struct _ScsiRead10
@@ -348,7 +348,7 @@ static const char * get_scsi_cmd_name(uint8_t cmd)
 		NULL,
 		NULL,
 		NULL, /* 0x10 */
-		NULL, 
+		NULL,
 		"INQUIRY",
 		NULL,
 		NULL,
@@ -378,7 +378,7 @@ static const char * get_scsi_cmd_name(uint8_t cmd)
 		NULL,
 		NULL,
 		"WRITE AND VERIFY (10)",
-		"VERIFY (10)", 
+		"VERIFY (10)",
 		NULL, /* 0x30 */
 		NULL,
 		NULL,
@@ -442,7 +442,7 @@ static const char * get_scsi_cmd_name(uint8_t cmd)
 		NULL,
 		NULL,
 		NULL,
-		NULL, 
+		NULL,
 		NULL, /* 0x70 */
 		NULL,
 		NULL,
@@ -512,7 +512,7 @@ static const char * get_scsi_cmd_name(uint8_t cmd)
 		NULL,
 		NULL,
 		NULL,
-		"SECUIRTY PROTOCOL OUT", 
+		"SECUIRTY PROTOCOL OUT",
 		"SET STREAMING",
 		NULL,
 		NULL,
@@ -586,9 +586,9 @@ static const char * get_scsi_cmd_name(uint8_t cmd)
 		NULL,
 		NULL,
 		NULL,
-		NULL,		
+		NULL,
 	};
-	
+
 	return cmd_str[cmd];
 }
 

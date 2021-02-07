@@ -11,7 +11,7 @@ typedef uint32_t Elf32_Size;
 /*
  * ELF header.
  */
-typedef struct 
+typedef struct
 {
 	unsigned char	e_ident[16];	// File identification.  				// 0
 	Elf32_Half	e_type;				// File type. */          				// 0x10
@@ -32,7 +32,7 @@ typedef struct
 /*
  * Section header.
  */
-typedef struct 
+typedef struct
 {
 	Elf32_Word	sh_name;		// Section name (index into the	section header string table). // 0
 	Elf32_Word	sh_type;		/* Section type. */
@@ -50,7 +50,7 @@ typedef struct
  * Program header.
  */
 
-typedef struct 
+typedef struct
 {
 	Elf32_Word	p_type;			/* Entry type. */
 	Elf32_Off	p_offset;		/* File offset of contents. */
@@ -62,10 +62,10 @@ typedef struct
 	Elf32_Size	p_align;		/* Alignment in memory and file. */
 } __attribute__((packed)) Elf32_Phdr;
 
-typedef struct 
+typedef struct
 {
 	uint16_t attribute;
-	uint8_t module_ver_lo;	
+	uint8_t module_ver_lo;
 	uint8_t module_ver_hi;
 	char	modname[28];
 } __attribute__((packed)) PspModuleInfo;

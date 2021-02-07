@@ -8,5 +8,3 @@ LV2_FUNCTION(cellUsbdOpenPipe, cellUsbdOpenPipe_symbol)
 LV2_FUNCTION(cellUsbdClosePipe, cellUsbdClosePipe_symbol)
 LV2_FUNCTION(cellUsbdControlTransfer, cellUsbdControlTransfer_symbol)
 LV2_FUNCTION(cellUsbdBulkTransfer, cellUsbdBulkTransfer_symbol)
-
-

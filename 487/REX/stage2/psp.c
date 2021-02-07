@@ -171,20 +171,20 @@ int sys_psp_read_header(int fd, char *buf, uint64_t nbytes, uint64_t *nread)
 	kfree(list);
 	kfree(unk);
 
-	if (ret != SUCCEEDED)
+	if (ret) // (ret != SUCCEEDED)
 		return ret;
 
 	ret = cellFsOpen(umd_file, CELL_FS_O_RDONLY, &umd_fd, 0, NULL, 0);
-	if (ret != SUCCEEDED)
+	if (ret) // (ret != SUCCEEDED)
 		return ret;
 
 	cellFsLseek(umd_fd, 0, SEEK_END, &umd_size);
 
 	// Fake header. We will write only values actually used
 	memset(buf, 0, 0x100);
-	*(uint32_t *)(buf+0x0c) = 0x10;
-	*(uint32_t *)(buf+0x64) = (umd_size/0x800)-1; // Last sector of umd
-	strncpy(buf+0x70, psp_id, 10);
+	*(uint32_t *)(buf + 0x0c) = 0x10;
+	*(uint32_t *)(buf + 0x64) = (umd_size/0x800)-1; // Last sector of umd
+	strncpy(buf + 0x70, psp_id, 10);
 
 	#ifdef DEBUG
 		DPRINTF("ID: %s\n", psp_id);
@@ -216,7 +216,7 @@ int sys_psp_read_umd(int unk, void *buf, uint64_t sector, uint64_t ofs, uint64_t
 
 		int ret = open_kernel_object(object_table, *(uint32_t *)(emulator_api_base+umd_mutex_offset), (void **)&mutex, &obj_handle, SYS_MUTEX_OBJECT);
 
-		if (ret != SUCCEEDED)
+		if (ret) // (ret != SUCCEEDED)
 		{
 			#ifdef DEBUG
 				DPRINTF("Cannot open user mutex, using an own one\n");
@@ -237,13 +237,13 @@ int sys_psp_read_umd(int unk, void *buf, uint64_t sector, uint64_t ofs, uint64_t
 	mutex_lock(mutex, 0);
 	offset = sector * 0x800;
 
-	if (ofs != 0)
+	if (ofs) // (ofs != 0)
 	{
 		offset = offset + 0x800 - ofs;
 	}
 
 	ret = cellFsLseek(umd_fd, offset, SEEK_SET, &dummy);
-	if (ret != SUCCEEDED)
+	if (ret) // (ret != SUCCEEDED)
 	{
 		mutex_unlock(mutex);
 		return ret;
@@ -308,7 +308,7 @@ int sys_psp_set_umdfile(char *file, char *id, int prometheus)
 		return EINVAL;
 
 	ret = pathdup_from_user(file, &umd_file);
-	if (ret != SUCCEEDED)
+	if (ret) // (ret != SUCCEEDED)
 		return ret;
 
 	condition_psp_iso = 1;

@@ -17,6 +17,7 @@ static unsigned char RAP_E2[]   = {0x67, 0xD4, 0x5D, 0xA3, 0x29, 0x6D, 0x00, 0x6
 static void get_rif_key(unsigned char *rap, unsigned char *key)
 {
 	int i;
+	int round;
 
 	unsigned char iv[0x10];
 
@@ -27,7 +28,7 @@ static void get_rif_key(unsigned char *rap, unsigned char *key)
 	aescbccfb_dec(key, rap, 0x10, RAP_KEY, RAP_KEYBITS, iv);
 
 	// rap2rifkey round.
-	for (int round = 0; round < 5; ++round)
+	for (round = 0; round < 5; ++round)
 	{
 		for (i = 0; i < 0x10; ++i)
 		{
@@ -75,7 +76,7 @@ static uint8_t make_rif_buf[0x20 + 0x28 + 0x50 + 0x20 + 0x28]; // ACT_DAT[0x20] 
 static void read_act_dat_and_make_rif(uint8_t *rap, uint8_t *act_dat, const char *content_id, const char *rif_path)
 {
 	int fd;
-	if(cellFsOpen(rif_path, CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &fd, 0666, NULL, 0) == SUCCEEDED)
+	if(cellFsOpen(rif_path, CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &fd, 0666, NULL, 0) == CELL_FS_SUCCEEDED)
 	{
 		uint8_t idps_const[0x10]    = {0x5E,0x06,0xE0,0x4F,0xD9,0x4A,0x71,0xBF,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01};
 		uint8_t rif_key_const[0x10] = {0xDA,0x7D,0x4B,0x5E,0x49,0x9A,0x4F,0x53,0xB1,0xC1,0xA1,0x4A,0x74,0x84,0x44,0x3B};
@@ -129,16 +130,16 @@ static void read_act_dat_and_make_rif(uint8_t *rap, uint8_t *act_dat, const char
 static void read_act_dat_and_make_rif(uint8_t *rap, uint8_t *act_dat, const char *content_id, const char *rif_path)
 {
 	CellFsStat stat;
-	if(cellFsStat("/dev_usb000/reactPSN.BIN",   &stat) != SUCCEEDED)
-	if(cellFsStat("/dev_usb001/reactPSN.BIN",   &stat) != SUCCEEDED)
-	if(cellFsStat("/dev_hdd0/hen/reactPSN.BIN", &stat) != SUCCEEDED) return;
+	if(cellFsStat("/dev_usb000/reactPSN.BIN",   &stat) /* != CELL_FS_SUCCEEDED */)
+	if(cellFsStat("/dev_usb001/reactPSN.BIN",   &stat) /* != CELL_FS_SUCCEEDED */)
+	if(cellFsStat("/dev_hdd0/hen/reactPSN.BIN", &stat) /* != CELL_FS_SUCCEEDED */) return;
 	{
 		uint64_t payload_size = stat.st_size; if(payload_size < 0x5000) return;
 
 		int fd;
-		if(cellFsOpen("/dev_usb000/reactPSN.BIN",   CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) != SUCCEEDED)
-		if(cellFsOpen("/dev_usb001/reactPSN.BIN",   CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) != SUCCEEDED)
-		if(cellFsOpen("/dev_hdd0/hen/reactPSN.BIN", CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) != SUCCEEDED) return;
+		if(cellFsOpen("/dev_usb000/reactPSN.BIN",   CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) /* != CELL_FS_SUCCEEDED */)
+		if(cellFsOpen("/dev_usb001/reactPSN.BIN",   CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) /* != CELL_FS_SUCCEEDED */)
+		if(cellFsOpen("/dev_hdd0/hen/reactPSN.BIN", CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) /* != CELL_FS_SUCCEEDED */) return;
 		{
 			uint64_t nread;
 
@@ -170,12 +171,14 @@ static void make_rif(const char *path)
 {
 	//if(!is_hdd0) return; // checked in homebrew_blocker.h
 
+	if(strncmp(path + 9, "/home/", 6)) return; // /dev_hdd0/home/
+
 	int path_len = strlen(path); if(path_len != 71) return; // example: /dev_hdd0/home/00000001/exdata/2P0001-PS2U10000_00-0000111122223333.rif
 
-	if(!strncmp(path, "/dev_hdd0/home/", 15) && !strcmp(path + path_len - 4, ".rif"))
+	if(!strcmp(path + path_len - 4, ".rif"))
 	{
 		CellFsStat stat;
-		if(skip_existing_rif && (cellFsStat(path, &stat) == SUCCEEDED)) return; // rif already exists
+		if(skip_existing_rif && (cellFsStat(path, &stat) == CELL_FS_SUCCEEDED)) return; // rif already exists
 
 		#ifdef DEBUG
 		DPRINTF("open_path_hook: %s (looking for rap)\n", path);
@@ -191,8 +194,8 @@ static void make_rif(const char *path)
 		if(!is_ps2_classic)
 		{
 			sprintf(rap_path, "/dev_usb000/exdata/%.36s.rap", content_id);
-			if(cellFsStat(rap_path, &stat) != SUCCEEDED) {rap_path[10] = '1'; //usb001
-			if(cellFsStat(rap_path, &stat) != SUCCEEDED) sprintf(rap_path, "/dev_hdd0/exdata/%.36s.rap", content_id);}
+			if(cellFsStat(rap_path, &stat) /* != CELL_FS_SUCCEEDED */) {rap_path[10] = '1'; //usb001
+			if(cellFsStat(rap_path, &stat) /* != CELL_FS_SUCCEEDED */) sprintf(rap_path, "/dev_hdd0/exdata/%.36s.rap", content_id);}
 		}
 
 		// default: ps2classic rap
@@ -218,6 +221,16 @@ static void make_rif(const char *path)
 				char *rif_path = ALLOC_PATH_BUFFER;
 				sprintf(rif_path, "/%s", path);
 				read_act_dat_and_make_rif(rap, act_dat, content_id, rif_path);
+
+				#ifdef DEBUG
+					DPRINTF("rif_path:%s\n", rif_path);
+				#endif
+			}
+			else
+			{
+				#ifdef DEBUG
+					DPRINTF("act.dat not found: %s\n", act_path);
+				#endif
 			}
 		}
 	}

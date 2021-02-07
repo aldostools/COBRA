@@ -237,6 +237,10 @@
 #define lic_patch										0x56230
 #define ode_patch										0x2275F4
 
+#define sm_get_temperature_patch 					    0xC6A8
+#define sm_get_fan_policy_patch 						0x9E38
+#define sm_set_fan_policy_patch 						0xA334
+
 /* Rtoc entries */
 
 #define io_rtoc_entry_1									0x25B8
@@ -574,12 +578,16 @@
 
 #endif /* FIRMWARE */
 
-//#define DO_REACTPSN
 #define MAKE_RIF
+#define DO_PHOTO_GUI
+#define DO_AUTO_RESTORE_SC
+#define DO_AUTO_MOUNT_DEV_BLIND
+#define DO_PARTIAL_MAP_PATH
 #define QA_FLAG
 #define FAN_CONTROL
 #define APPLY_KERNEL_PATCHES
 //#define DO_PATCH_PS2 // ps2emu patches are hardcoded in Rebug
+//#define DO_AUTO_EARTH // is causing black screen: Connect USB controller
+//#define DO_REACTPSN // is causing black screen
 
 #endif /* __FIRMWARE_SYMBOLS_H_S__ */
-

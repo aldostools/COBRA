@@ -18,7 +18,3 @@ LV2_FUNCTION(cellFsRename_internal, cellFsRename_internal_symbol)
 LV2_FUNCTION(pathdup_from_user, pathdup_from_user_symbol)
 LV2_FUNCTION(open_fs_object, open_fs_object_symbol)
 LV2_FUNCTION(close_fs_object, close_fs_object_symbol)
-
-
-
-

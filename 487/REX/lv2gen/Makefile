@@ -7,7 +7,7 @@ LDFLAGS 	= -L. -lstdc++
 all: $(OUTPUT)
 
 clean:
-	rm -f *.o *.exe
+	@rm -f *.o *.exe
 
 $(OUTPUT): $(OBJS)
 	$(LINK.c) $(LDFLAGS) -o $@ $^ $(LIBS)

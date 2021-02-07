@@ -14,6 +14,7 @@
 #include <lv2/synchronization.h>
 #include <lv2/modules.h>
 #include <lv2/io.h>
+#include <lv2/fan.h>
 #include <lv2/time.h>
 #include <lv2/security.h>
 #include <lv2/error.h>
@@ -76,9 +77,7 @@
 #define MAKE_VERSION(cobra, fw, type) ((cobra & 0xFF) | ((fw & 0xffff) << 8) | ((type & 0x1) << 24))
 #define N_KERNEL_PATCHES	(sizeof(kernel_patches) / sizeof(Patch))
 
-//uint8_t allow_restore_sc = 1;
 //uint8_t auto_dev_blind = 1;
-//extern uint8_t photo_gui;
 
 typedef struct
 {
@@ -113,7 +112,7 @@ static Patch kernel_patches[] =
 	{ ode_patch, LI(R3, 0) },
 	{ ode_patch + 4, STD(R3, 0, R9) },
 
-	//Fan patches
+	// Fan patches
 	{ sm_get_temperature_patch, LI(R3, 0) },
 	{ sm_get_fan_policy_patch, LI(R3, 1) },
 	{ sm_set_fan_policy_patch, LI(R3, 1) },
@@ -439,8 +438,6 @@ void create_syscalls(void)
 	create_syscall2(10, sys_cfw_lv1_call);
 	create_syscall2(11, sys_cfw_lv1_peek);
 	create_syscall2(15, sys_cfw_lv2_func);
-	create_syscall2(389, sm_set_fan_policy_sc);
-	create_syscall2(409, sm_get_fan_policy_sc);
 }
 
 static inline void ps3mapi_unhook_all(void)
@@ -745,10 +742,6 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				//----------
 				//MISC
 				//----------
-				/*case PS3MAPI_OPCODE_AUTO_DEV_BLIND:
-					auto_dev_blind = (uint8_t)param2;
-					return auto_dev_blind;
-				break;*/
 				case PS3MAPI_OPCODE_PHOTO_GUI:
 					photo_gui = (uint8_t)param2;
 					return photo_gui;
@@ -791,8 +784,6 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 35) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 36) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 38) = syscall_not_impl;
-				*(uint64_t *)MKA(syscall_table_symbol + 8 * 389) = syscall_not_impl;
-				*(uint64_t *)MKA(syscall_table_symbol + 8 * 409) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 6) = syscall_not_impl;
 				*(uint64_t *)MKA(syscall_table_symbol + 8 * 7) = syscall_not_impl;
 			return SYSCALL8_STEALTH_OK;
@@ -1041,6 +1032,7 @@ int main(void)
 	storage_ext_patches();
 	region_patches();
 	permissions_patches();
+	fan_patches();
 	
 #ifdef DEBUG
 	// "Laboratory"

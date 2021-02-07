@@ -5,23 +5,12 @@
 #include <lv2/memory.h>
 #include <lv2/thread.h>
 #include <lv2/time.h>
+#include <lv2/fan.h>
 #include "common.h"
 #include "fan_control.h"
 
 uint8_t fan_control_running = 0;
 uint8_t fan_speed;
-
-int sm_set_fan_policy(uint8_t unk, uint8_t _fan_mode, uint8_t _fan_speed)
-{
-	f_desc_t f;
-	f.addr = (void *)MKA(sm_set_fan_policy_symbol);
-	f.toc  = (void *)MKA(TOC);
-	int(*func)(uint64_t, uint8_t,uint8_t,uint8_t) = (void *)&f;
-
-	int ret = func(MKA(sysmem_obj), unk, _fan_mode, _fan_speed);
-
-	return ret;
-}
 
 int sm_get_fan_speed(void)
 {
@@ -30,71 +19,14 @@ int sm_get_fan_speed(void)
 	uint8_t _fan_speed;
 	uint8_t unk;
 
-	f_desc_t f;
-	f.addr = (void*)MKA(sm_get_fan_policy_symbol);
-	f.toc  = (void*)MKA(TOC);
-	int(*func)(uint64_t, uint8_t, uint8_t *, uint8_t *, uint8_t *, uint8_t *, uint64_t) = (void*)&f;
-
-	func(MKA(sysmem_obj), 0, &st, &mode, &_fan_speed, &unk, 10000000);
+	sm_get_fan_policy(0, &st, &mode, &_fan_speed, &unk);
 
 	return _fan_speed;
 }
 
-LV2_SYSCALL2(int, sm_set_fan_policy_sc,(uint8_t unk, uint8_t _fan_mode, uint8_t _fan_speed))
-{
-	// fan modes: 1 = SYSCON, 2 = MANUAL
-	if(_fan_mode == 2) 
-		fan_control_running = 0; // disable internal fan control if fan speed is set manually via syscall 389
-
-	return sm_set_fan_policy(unk, _fan_mode, _fan_speed);
-}
-
-LV2_SYSCALL2(int, sm_get_fan_policy_sc,(uint8_t id, uint8_t *st, uint8_t *policy, uint8_t *mode, uint8_t *duty))
-{
-	uint8_t st1;
-	uint8_t policy1;
-	uint8_t mode1;
-	uint8_t duty1;
-	f_desc_t f;
-	f.addr = (void*)MKA(sm_get_fan_policy_symbol);
-	f.toc  = (void*)MKA(TOC);
-	int(*func)(uint64_t, uint8_t, uint8_t *, uint8_t *, uint8_t *, uint8_t *, uint64_t) = (void*)&f;
-
-	int ret = func(MKA(sysmem_obj), id, &st1, &policy1, &mode1, &duty1, 10000000);
-
-	if(ret == 0)
-	{
-		ret = copy_to_user(&st1, st, 1);
-		if(ret == 0)
-		{
-			ret = copy_to_user(&policy1, policy, 1);
-			if(ret == 0)
-			{
-				ret = copy_to_user(&mode1, mode, 1);
-				if(ret == 0)				
-					ret = copy_to_user(&duty1, duty, 1);				
-			}
-		}
-	}
-
-	return ret;
-}
-
-static void get_temperature(uint32_t id, uint32_t *temp)
-{
-	f_desc_t f;
-	f.addr = (void*)MKA(sm_get_temperature_symbol);
-	f.toc  = (void*)MKA(TOC);
-	int(*func)(uint64_t, uint32_t, uint32_t *, uint64_t) = (void*)&f;
-	func(MKA(sysmem_obj), id, temp, 1000000);
-	*temp >>= 24; // return °C
-}
-
 static void fan_control(uint64_t arg0)
 {
-	#ifdef DEBUG
-		DPRINTF("CONTROL FAN Payload: Started.\n");
-	#endif
+	DPRINTF("CONTROL FAN Payload: Started.\n");
 
 	uint32_t t_cpu, t_rsx, prev = 0; 
 	fan_control_running = 1;
@@ -106,8 +38,9 @@ static void fan_control(uint64_t arg0)
 		if(fan_control_running) // Avoids loading previous mode [Evilnat]
 		{
 			t_cpu = t_rsx = 0;
-			get_temperature(0, &t_cpu);
-			get_temperature(1, &t_rsx);
+			
+			sm_get_temperature(0, &t_cpu);
+			sm_get_temperature(1, &t_rsx);
 
 			if(t_rsx > t_cpu) 
 				t_cpu = t_rsx;
@@ -138,8 +71,8 @@ void do_fan_control(void)
 {
 	thread_t fan_control_id;
 
-	if(!fan_control_running)
-		ppu_thread_create(&fan_control_id, fan_control, 0, -0x1D8, 0x4000, 0, "fan_control");
+	if(!fan_control_running)	
+		ppu_thread_create(&fan_control_id, fan_control, 0, -0x1D8, 0x4000, 0, "fan_control");	
 }
 
 void load_fan_control(void)
@@ -152,4 +85,22 @@ void load_fan_control(void)
 		sm_set_fan_policy(0, 1, 0);
 	else
 		do_fan_control();  // Dynamic fan control
+}
+
+LV2_HOOKED_FUNCTION_COND_POSTCALL_3(int, sm_set_fan_policy_sc, (uint8_t unk, uint8_t _fan_mode, uint8_t _fan_speed))
+{
+	fan_control_running = 0; // disable internal fan control if fan speed is set manually via syscall 389
+	return DO_POSTCALL;
+}
+
+void fan_patches(void)
+{
+	hook_function_with_cond_postcall(get_syscall_address(389), sm_set_fan_policy_sc, 3);
+}
+
+void unhook_all_fan_patches(void)
+{
+	suspend_intr();
+	unhook_function_with_precall(get_syscall_address(389), sm_set_fan_policy_sc, 3);
+	resume_intr();
 }

@@ -22,4 +22,3 @@ resume_intr:
 	
 LV2_FUNCTION(spin_lock_irqsave_ex, spin_lock_irqsave_ex_symbol)
 LV2_FUNCTION(spin_unlock_irqrestore_ex, spin_unlock_irqrestore_ex_symbol)
-

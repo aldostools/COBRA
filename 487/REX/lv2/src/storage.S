@@ -11,6 +11,3 @@ LV2_FUNCTION(storage_send_device_command, storage_send_device_command_symbol)
 LV2_FUNCTION(storage_map_io_memory, storage_map_io_memory_symbol)
 LV2_FUNCTION(storage_unmap_io_memory, storage_unmap_io_memory_symbol)
 LV2_FUNCTION(storage_internal_get_device_object, storage_internal_get_device_object_symbol)
-
-
-

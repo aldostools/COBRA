@@ -90,7 +90,7 @@ static INLINE void set_bd_video_region(uint8_t *region)
 		}
 	}
 
-	if (fake_region != 0)
+	if (fake_region) // (fake_region != 0)
 		*region = fake_region;
 }
 
@@ -117,7 +117,6 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_2(int, region_func, (uint64_t func, uint8_t 
 			}
 		}
 	}
-
 
 	return 0;
 }

@@ -22,7 +22,6 @@
 #define STAGE2_FAILSAFE			"/dev_flash/rebug/cobra/failsafe"
 
 #define FAILED					-1
-#define CELL_FS_SUCCEEDED		0
 
 static int disable_cobra_stage2(void)
 {

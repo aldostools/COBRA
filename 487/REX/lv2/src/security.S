@@ -1,11 +1,6 @@
 #include <lv2/macros.h.S>
 #include <lv2/symbols.h>
 
-#if defined(aescbccfb_enc_symbol) && defined(aescbccfb_dec_symbol)
-LV2_FUNCTION(aescbccfb_enc, aescbccfb_enc_symbol)
-LV2_FUNCTION(aescbccfb_dec, aescbccfb_dec_symbol)
-#endif
-
 #ifdef get_pseudo_random_number_symbol
 LV2_FUNCTION(get_pseudo_random_number, get_pseudo_random_number_symbol)
 #endif
@@ -22,6 +17,11 @@ LV2_FUNCTION(sha1_update, SHA1_update_symbol)
 LV2_FUNCTION(sha1_final, SHA1_final_symbol)
 #endif
 
+#if defined(aescbccfb_enc_symbol) && defined(aescbccfb_dec_symbol)
+LV2_FUNCTION(aescbccfb_enc, aescbccfb_enc_symbol)
+LV2_FUNCTION(aescbccfb_dec, aescbccfb_dec_symbol)
+#endif
+
 #ifdef ss_get_open_psid_symbol
 LV2_FUNCTION(ss_get_open_psid, ss_get_open_psid_symbol)
 #endif
@@ -33,4 +33,3 @@ LV2_FUNCTION(update_mgr_read_eeprom, update_mgr_read_eeprom_symbol)
 #ifdef update_mgr_write_eeprom_symbol
 LV2_FUNCTION(update_mgr_write_eeprom, update_mgr_write_eeprom_symbol)
 #endif
-

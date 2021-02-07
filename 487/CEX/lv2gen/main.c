@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 	
 	remove("temp.elf");
 	remove("lv2_kernel.elf");
-	
+
 	return 0;
 }
 	

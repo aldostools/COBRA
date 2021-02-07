@@ -13,13 +13,21 @@
 
 CobraConfig config;
 
+#ifdef FAN_CONTROL
 extern uint8_t set_fan_speed;		// fan_control.h
+#endif
+#ifdef DO_AUTO_MOUNT_DEV_BLIND
 extern uint8_t auto_dev_blind;		// homebrew_blocker.h
+#endif
+#ifdef DO_AUTO_RESTORE_SC
 extern uint8_t allow_restore_sc;	// homebrew_blocker.h
+#endif
+#ifdef DO_PHOTO_GUI
 extern uint8_t photo_gui;			// mappath.c
+#endif
+#ifdef DO_AUTO_EARTH
 extern uint8_t auto_earth;			// mappath.c
-
-int sm_set_fan_policy(uint8_t arg1, uint8_t arg2, uint8_t arg3);
+#endif
 
 void load_fan_control(void);
 void do_fan_control(void);
@@ -107,11 +115,18 @@ int read_cobra_config(void)
 	bd_video_region = config.bd_video_region;
 	dvd_video_region = config.dvd_video_region;
 
+	#ifdef DO_AUTO_MOUNT_DEV_BLIND
 	auto_dev_blind   = !config.auto_dev_blind;		// 0 = Allow auto-mount /dev_blind   | 1 = Does not allow auto-mount /dev_blind
+	#endif
+	#ifdef DO_AUTO_RESTORE_SC
 	allow_restore_sc = !config.allow_restore_sc;	// 0 = Allow to restore CFW syscalls | 1 = Does not allow to restore CFW syscalls
+	#endif
+	#ifdef DO_PHOTO_GUI
 	photo_gui        = !config.photo_gui;			// 0 = Allow Photo GUI				 | 1 = Does not allow Photo GUI
+	#endif
+	#ifdef DO_AUTO_EARTH
 	auto_earth       = !config.auto_earth;			// 0 = Allow auto-map earth.qrc      | 1 = Does not allow auto-map earth.qrc
-
+	#endif
 	#ifdef FAN_CONTROL
 	set_fan_speed    = config.fan_speed;			// 0 = DISABLED, 1 = SYSCON, 2 = Dynamic Fan Controller, 0x33 to 0xFF = Set manual fan speed
 	load_fan_control();

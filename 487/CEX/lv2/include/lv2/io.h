@@ -93,7 +93,6 @@ LV2_EXPORT int cellFsUtime(const char *path, CellFsUtimbuf *timep);
 
 #ifdef io_sub_rtoc_entry_1
 
-
 LV2_EXPORT int cellFsRename_internal(void *structure, const char *from, const char *to, uint64_t unk);
 
 static INLINE int cellFsRename(const char *from, const char *to)
@@ -126,4 +125,3 @@ LV2_EXPORT int open_fs_object(void *unk, char *path, void **fs_object, void **un
 LV2_EXPORT int close_fs_object(void *unk, fs_object_handle_t handle);
 
 #endif /* __LV2_IO_H__ */
-

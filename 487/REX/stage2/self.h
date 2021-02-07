@@ -106,7 +106,8 @@ typedef struct
 {
 	uint32_t type; // 1==control flags; 2==file digest        0
 	uint32_t size; // 4
-	union {
+	union
+	{
 		// type 1
 		struct
 		{
@@ -126,7 +127,7 @@ typedef struct
 } __attribute__((packed)) CONTROL_INFO; */
 
 /* typedef struct
-{
+{s
 	//uint8_t ignore[32];
 	uint8_t key[16];
 	uint8_t key_pad[16];

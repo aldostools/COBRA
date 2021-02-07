@@ -28,5 +28,3 @@ void region_patches(void);
 void unhook_all_region(void);
 
 #endif
-
-

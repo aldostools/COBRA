@@ -21,4 +21,3 @@ loc_0:
 	blr
 
 LV2_FUNCTION(process_kill, process_kill_symbol)
-
