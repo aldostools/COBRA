@@ -30,7 +30,6 @@ extern uint8_t auto_earth;			// mappath.c
 #endif
 
 void load_fan_control(void);
-void do_fan_control(void);
 
 static void check_and_correct(CobraConfig *cfg)
 {

@@ -5,7 +5,7 @@
 * REBUG 4.86.1 LITE (Untested!!!)
 * CFW 4.87 (Untested!!!)
 
-COBRA 8.3 Source
+COBRA 8.3 Source (WIP)
 
 [ Joonie's Changes ]
 
@@ -112,6 +112,8 @@ Original COBRA payload was relying on ps1emu's detection method, now COBRA has e
 
 [Evilnat's changes]
 
+* Improvements to Fan Control
+* Support for QA flags based on Habib's code
 * Updated KW's code to search webMAN in flash and load it firstly if it's found in /dev_hdd0, will search in the following paths:
 	- /dev_flash/vsh/module/webftp_server.sprx
 	- /dev_flash/ps3ita/webftp_server.sprx

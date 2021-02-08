@@ -1,8 +1,9 @@
+#include <lv2/symbols.h>
+
 //----------------------------------------
 //KERNEL PATCH
 //----------------------------------------
-#define DO_PATCH_KERNEL_PATCH
-//----------------------------------------
+
 #ifdef DO_PATCH_KERNEL_PATCH
 typedef struct
 {
@@ -39,6 +40,13 @@ static Patch kernel_patches[] =
 	#ifdef ode_patch
 	{ ode_patch, LI(R3, 0) },
 	{ ode_patch + 4, STD(R3, 0, R9) },
+	#endif
+
+	// Fan patches
+	#ifdef FAN_CONTROL
+	{ sm_get_temperature_patch, LI(R3, 0) },
+	{ sm_get_fan_policy_patch, LI(R3, 1) },
+	{ sm_set_fan_policy_patch, LI(R3, 1) },
 	#endif
 };
 

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <lv2/lv2.h>
+#include <lv2/fan.h>
 #include <lv2/libc.h>
 #include <lv2/memory.h>
 #include <lv2/patch.h>
@@ -42,7 +43,8 @@
 #include "peek_poke.h"
 #include "fan_control.h"
 //#include "reactPSN.h"
-#include "qa_flag.h"
+//#include "qa_flag.h"
+#include "qa.h"
 
 // Format of version:
 // byte 0, 7 MS bits -> reserved
@@ -515,7 +517,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				//REMOVE HOOK
 				//----------
 				case PS3MAPI_OPCODE_REMOVE_HOOK:
-					ps3mapi_unhook_all(); //REMOVE ALL "MAMBA/COBRA" HOOK
+					ps3mapi_unhook_all(); //REMOVE ALL "MAMBA/COBRA" HOOK - modulespatch.c
 					return SUCCEEDED;
 				break;
 
@@ -581,6 +583,19 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 					return sm_get_fan_speed();
 				break;
 				#endif
+
+				//----------
+				//QA
+				//----------
+				case PS3MAPI_OPCODE_CHECK_QA:
+					return read_qa_flag();
+				break;
+				case PS3MAPI_OPCODE_ENABLE_QA:
+					return set_qa_flag(1);
+				break;
+				case PS3MAPI_OPCODE_DISABLE_QA:
+					return set_qa_flag(0);
+				break;
 
 				//----------
 				//DEFAULT
