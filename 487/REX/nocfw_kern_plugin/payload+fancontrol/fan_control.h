@@ -7,7 +7,7 @@
 static uint8_t fan_control_running = 0;
 
 uint8_t set_fan_speed = 0;
-
+/*
 static int sm_get_fan_speed(void)
 {
 	uint8_t st;
@@ -19,7 +19,7 @@ static int sm_get_fan_speed(void)
 
 	return fan_speed;
 }
-
+*/
 static void fan_control(uint64_t arg0)
 {
 	#ifdef DEBUG
