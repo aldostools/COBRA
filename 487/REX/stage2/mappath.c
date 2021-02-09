@@ -30,7 +30,6 @@ MapEntry map_table[MAX_TABLE_ENTRIES];
 #define MAX_PATH_NEW	384
 
 // TODO: map_path and open_path_hook should be mutexed...
-static mutex_t mutex;
 
 f_desc_t open_path_callback;
 
@@ -363,13 +362,12 @@ LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 		{
 			//DPRINTF("?: [%s]\n", path);
 
-			#ifdef DO_AUTO_EARTH
 			////////////////////////////////////////////////////////////////////////////////////
 			// Auto change earth.qrc - DeViL303 & AV                                          //
 			////////////////////////////////////////////////////////////////////////////////////
-			if(auto_earth && (strncmp(path, "/dev_flash/vsh/resource/qgl/earth.qrc", 37) == SUCCEEDED))
+			#ifdef DO_AUTO_EARTH
+			if(auto_earth && (strcmp(path, "/dev_flash/vsh/resource/qgl/earth.qrc") == SUCCEEDED))
 			{
-				mutex_lock(mutex, 0);
 				char new_earth[30];
 				sprintf(new_earth, "%s/%i.qrc", "/dev_hdd0/tmp/earth", ++earth_id);
 
@@ -378,15 +376,14 @@ LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 					set_patched_func_param(1, (uint64_t)new_earth);
 				else
 					earth_id = 0;
-				mutex_unlock(mutex);
 				return;
 			}
 			#endif
 
-			#ifdef DO_PHOTO_GUI
 			////////////////////////////////////////////////////////////////////////////////////
 			// Photo_GUI integration with webMAN MOD - DeViL303 & AV                          //
 			////////////////////////////////////////////////////////////////////////////////////
+			#ifdef DO_PHOTO_GUI
 			if(!libft2d_access)
 			{
 				libft2d_access = photo_gui && !strcmp(path, "/dev_flash/sys/internal/libft2d.sprx");
@@ -428,14 +425,8 @@ LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 						// -- AV: use partial folder remapping when newpath starts with double '/' like //dev_hdd0/blah...
 						if(map_table[i].newpath[1] == '/')
 						{
-							#define use_original_path	len
-
-							mutex_lock(mutex, 0);
 							CellFsStat stat;
-							use_original_path = ( (cellFsStat(map_table[i].newpath, &stat) != CELL_FS_SUCCEEDED) && (cellFsStat(path0, &stat) == CELL_FS_SUCCEEDED) );
-							mutex_unlock(mutex);
-
-							if(use_original_path)
+							if(cellFsStat(map_table[i].newpath, &stat) != CELL_FS_SUCCEEDED)
 							{
 								#ifdef DEBUG
 								DPRINTF("open_path %s\n", path0);
@@ -515,7 +506,7 @@ int sys_aio_copy_root(char *src, char *dst)
 					if (dst[j] == 0)
 						break;
 
-					if (dst[j] == '/' && (j >= 8))
+					if (dst[j] == '/' && (j >= 7))
 					{
 						dst[j] = 0;
 						break;

@@ -20,6 +20,8 @@ uint8_t  psp_code;
 //char pspemu_path[36];
 //char psptrans_path[37];
 
+static uint32_t base_offset = 0;
+
 #define SPRX_NUM			90
 #define NUM_SCE_PSP_MODULES	5
 
@@ -180,6 +182,8 @@ int sys_psp_read_header(int fd, char *buf, uint64_t nbytes, uint64_t *nread)
 
 	cellFsLseek(umd_fd, 0, SEEK_END, &umd_size);
 
+	umd_size -= base_offset;
+
 	// Fake header. We will write only values actually used
 	memset(buf, 0, 0x100);
 	*(uint32_t *)(buf + 0x0c) = 0x10;
@@ -242,7 +246,7 @@ int sys_psp_read_umd(int unk, void *buf, uint64_t sector, uint64_t ofs, uint64_t
 		offset = offset + 0x800 - ofs;
 	}
 
-	ret = cellFsLseek(umd_fd, offset, SEEK_SET, &dummy);
+	ret = cellFsLseek(umd_fd, base_offset + offset, SEEK_SET, &dummy);
 	if (ret) // (ret != SUCCEEDED)
 	{
 		mutex_unlock(mutex);
@@ -260,6 +264,8 @@ int sys_psp_read_umd(int unk, void *buf, uint64_t sector, uint64_t ofs, uint64_t
 
 int sys_psp_set_umdfile(char *file, char *id, int prometheus)
 {
+	base_offset = 0;
+
 	int ret;
 
 	file = get_secure_user_ptr(file);
@@ -287,7 +293,7 @@ int sys_psp_set_umdfile(char *file, char *id, int prometheus)
 		}
 		if (patches_backup)
 		{
-			for (int i = 0; patches_backup[i].offset != 0; i++)
+			for (int i = 0; patches_backup[i].offset; i++)
 				copy_to_process(vsh_process, &patches_backup[i].data, (void *)(uint64_t)(0x10000+patches_backup[i].offset), 4);
 
 			free(patches_backup);
@@ -310,6 +316,12 @@ int sys_psp_set_umdfile(char *file, char *id, int prometheus)
 	ret = pathdup_from_user(file, &umd_file);
 	if (ret) // (ret != SUCCEEDED)
 		return ret;
+
+	int len = strlen(umd_file);
+	if(len > 4)
+	{
+		if(strcmp(file + (len - 4), ".PNG") == 0) base_offset = 0x10000;
+	}
 
 	condition_psp_iso = 1;
 	condition_psp_prometheus = prometheus;

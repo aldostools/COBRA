@@ -37,8 +37,6 @@ enum STORAGE_COMMAND
 void storage_ext_init(void);
 void storage_ext_patches(void);
 
-extern int ps2emu_type;
-
 /* Syscalls */
 
 typedef struct

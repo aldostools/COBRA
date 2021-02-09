@@ -152,7 +152,7 @@ int sys_read_cobra_config(CobraConfig *cfg)
 
 	cfg = get_secure_user_ptr(cfg);
 
-	if (cfg->size > 4096)
+	//if (cfg->size > 4096)
 	//	return EINVAL;
 
 /*	erase_size = cfg->size-sizeof(config.size);

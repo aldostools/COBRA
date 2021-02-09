@@ -187,9 +187,9 @@ static inline int block_homebrew(const char *path)
 				return SUCCEEDED;
 			}
 		}
+		else
 		#endif
 		#ifdef DO_AUTO_RESTORE_SC
-		else
 		if(allow_restore_sc)
 		{
 			if(!strcmp(path, "/dev_flash/vsh/module/software_update_plugin.sprx"))

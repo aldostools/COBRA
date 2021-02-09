@@ -44,6 +44,7 @@
 #define PS2EMU_CONFIG_FILE	"/dev_hdd0/tmp/cfg.bin"
 #define cfg_suffix 			"CONFIG"
 
+static int ps2emu_type;
 static INLINE void copy_ps2emu_stage2(int emu_type);
 
 #define MIN(a, b)	((a) <= (b) ? (a) : (b))
@@ -138,9 +139,8 @@ static int8_t disc_being_mounted = 0;
 static int8_t could_not_read_disc;
 static int8_t hdd0_mounted = 0;
 
-int ps2emu_type;
-
 static int video_mode = -2;
+static uint32_t base_offset = 0;
 
 //static char *encrypted_image;
 //static int encrypted_image_fd = -1;
@@ -320,7 +320,7 @@ static INLINE int process_read_iso_cmd(ReadIsoCmd *cmd)
 
 			if (doseek)
 			{
-				ret = cellFsLseek(discfd, filepos, SEEK_SET, &v);
+				ret = cellFsLseek(discfd, base_offset + filepos, SEEK_SET, &v);
 				if (ret) // (ret != SUCCEEDED)
 					break;
 
@@ -434,7 +434,7 @@ static INLINE int process_read_cd_iso2048_cmd(ReadIsoCmd *cmd)
 		{
 			if (doseek)
 			{
-				ret = cellFsLseek(discfd, sector * cd_sector_size, SEEK_SET, &v);
+				ret = cellFsLseek(discfd, base_offset + (sector * cd_sector_size), SEEK_SET, &v);
 				if (ret) // (ret != SUCCEEDED)
 					break;
 
@@ -605,7 +605,7 @@ static INLINE int process_read_cd_iso2352_cmd(ReadCdIso2352Cmd *cmd)
 		{
 			if (doseek)
 			{
-				ret = cellFsLseek(discfd, sector * cd_sector_size, SEEK_SET, &v);
+				ret = cellFsLseek(discfd, base_offset + (sector * cd_sector_size), SEEK_SET, &v);
 				if (ret) // (ret != SUCCEEDED)
 					break;
 
@@ -953,7 +953,7 @@ static int read_psx_sector(void *dma, void *buf, uint64_t sector)
 	{
 		uint64_t x;
 
-		cellFsLseek(discfd, (sector * cd_sector_size)+0x18, SEEK_SET, &x);
+		cellFsLseek(discfd, base_offset + (sector * cd_sector_size) + 0x18, SEEK_SET, &x);
 		return cellFsRead(discfd, buf, 2048, &x);
 	}
 	else if (discfile_proxy)
@@ -2610,9 +2610,9 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 	if (!hdd0_mounted && strcmp(mount_point, "/dev_hdd0") == 0 && strcmp(filesystem, "CELL_FS_UFS") == 0)
 	{
 		hdd0_mounted = 1;
+		read_cobra_config();
 		copy_ps2emu_stage2(ps2emu_type);
 		cellFsUnlink("/dev_hdd0/tmp/loadoptical");
-		read_cobra_config();
 		// do_spoof_patches();
 		load_boot_plugins();
 		load_boot_plugins_kernel();
@@ -2914,11 +2914,14 @@ static void do_umount_discfile(void)
 
 	disc_emulation = EMU_OFF;
 	total_emulation = 0;
-	emu_ps3_rec=0;
+	emu_ps3_rec = 0;
+	base_offset = 0;
 }
 
 static int check_files_and_allocate(unsigned int filescount, char *files[])
 {
+	base_offset = 0;
+
 	if (filescount == 0 || filescount > 32)
 		return EINVAL;
 
@@ -2927,8 +2930,10 @@ static int check_files_and_allocate(unsigned int filescount, char *files[])
 	for (int i = 0; i < filescount; i++)
 	{
 		int len = strlen(files[i]);
-		if (len >= MAX_PATH)
+		if ((len >= MAX_PATH) || (len < 4))
 			return EINVAL;
+
+		if(strcmp(files[i] + (len - 4), ".PNG") == 0) base_offset = _64KB_; // EXT
 
 		allocsize += (len + 1);
 	}
@@ -2960,15 +2965,15 @@ static int check_files_and_allocate(unsigned int filescount, char *files[])
 			DPRINTF("%s, filesize: %lx\n", files[i], stat.st_size);
 		#endif
 
-		if (stat.st_size < _4KB_)
+		if (stat.st_size < (_4KB_ + base_offset))
 		{
 			free(discfile);
 			discfile = NULL;
 			return EINVAL;
 		}
 
-		discfile->totalsize += stat.st_size;
-		discfile->sizes[i] = stat.st_size;
+		discfile->sizes[i] = (stat.st_size - base_offset);
+		discfile->totalsize += discfile->sizes[i];
 		discfile->files[i] = p;
 		strcpy(p, files[i]);
 		p += (strlen(p) + 1);
@@ -3089,6 +3094,8 @@ int mount_ps_cd(char *file, unsigned int trackscount, ScsiTrackDescriptor *track
 		if (ret == SUCCEEDED)
 		{
 			// -- AV: cd sector size
+			if(strcmp(file + (len - 4), ".PNG") == 0) base_offset = _64KB_; // EXT
+
 			if(cd_sector_size == 2352)
 			{
 				// detect sector size
@@ -3099,7 +3106,7 @@ int mount_ps_cd(char *file, unsigned int trackscount, ScsiTrackDescriptor *track
 					u16 sec_size[7] = {2352, 2048, 2336, 2448, 2328, 2340, 2368};
 					for(u8 n = 0; n < 7; n++)
 					{
-						cellFsLseek(discfd, (sec_size[n]<<4) + 0x18, SEEK_SET, &v);
+						cellFsLseek(discfd, base_offset + (sec_size[n]<<4) + 0x18, SEEK_SET, &v);
 						cellFsRead(discfd, buffer, 20, &v);
 						if(  (memcmp(buffer + 8, "PLAYSTATION ", 0xC) == 0) ||
 							((memcmp(buffer + 1, "CD001", 5) == 0) && buffer[0] == 0x01) ) {cd_sector_size = sec_size[n]; break;}
@@ -3159,6 +3166,8 @@ static int mount_ps2_discfile(unsigned int filescount, char *files[], unsigned i
 	int8_t is_2352 = 0;
 	int ret = SUCCEEDED;
 
+	if(strcmp(files[0] + (strlen(files[0]) - 4), ".PNG") == 0) base_offset = _64KB_; // EXT
+
 	if (trackscount > 1)
 	{
 		// We assume cd 2352 (cd_sector_size) here
@@ -3168,7 +3177,7 @@ static int mount_ps2_discfile(unsigned int filescount, char *files[], unsigned i
 	else
 	{
 		uint8_t buf[0xB0];
-		if (read_file_at_offset(files[0], buf, 0xB0, 0x8000) != 0xB0)
+		if (read_file_at_offset(files[0], buf, 0xB0, base_offset + 0x8000) != 0xB0)
 		{
 			return EINVAL;
 		}

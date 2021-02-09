@@ -88,8 +88,8 @@ int sys_psp_post_savedata_initstart(int result, void *param);
 int sys_psp_post_savedata_shutdownstart(void);
 
 #ifdef DEBUG
-	int sys_psp_sony_bug(uint32_t *mips_registers, void *unk, uint32_t mips_PC);
-	//int sys_generic_debug(uint64_t unk, uint32_t *ptr, void *sp);
+int sys_psp_sony_bug(uint32_t *mips_registers, void *unk, uint32_t mips_PC);
+//int sys_generic_debug(uint64_t unk, uint32_t *ptr, void *sp);
 #endif
 
 #endif /* __PSP_H__ */

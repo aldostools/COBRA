@@ -56,7 +56,7 @@ static INLINE void apply_kernel_patches(void)
 {
 	for (int i = 0; i < N_KERNEL_PATCHES; i++)
 	{
-		uint32_t *addr= (uint32_t *)MKA(kernel_patches[i].address);
+		uint32_t *addr = (uint32_t *)MKA(kernel_patches[i].address);
 		*addr = kernel_patches[i].data;
 		clear_icache(addr, 4);
 	}

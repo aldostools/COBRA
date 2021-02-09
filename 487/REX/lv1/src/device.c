@@ -68,9 +68,9 @@ int find_device_by_type(int type, int index, int *pbus_id, int *pdev_id, int *pi
 	s64 result;
 
 	printf("Locating device with type %d and index %d...\n", type, index);
-	for (bus_ndx=0; bus_ndx<10; bus_ndx++)
+	for (bus_ndx = 0; bus_ndx < 10; bus_ndx++)
 	{
-		u64 bus_id=0, bus_type=0, num_dev=0;
+		u64 bus_id = 0, bus_type = 0, num_dev = 0;
 
 		result = lv1_get_repository_node_value(PS3_LPAR_ID_PME, FIELD_FIRST("bus",bus_ndx),
 											   FIELD("type",0), 0, 0, &bus_type, &v2);

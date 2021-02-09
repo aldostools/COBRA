@@ -17,7 +17,6 @@ static unsigned char RAP_E2[]   = {0x67, 0xD4, 0x5D, 0xA3, 0x29, 0x6D, 0x00, 0x6
 static void get_rif_key(unsigned char *rap, unsigned char *key)
 {
 	int i;
-	int round;
 
 	unsigned char iv[0x10];
 
@@ -28,7 +27,7 @@ static void get_rif_key(unsigned char *rap, unsigned char *key)
 	aescbccfb_dec(key, rap, 0x10, RAP_KEY, RAP_KEYBITS, iv);
 
 	// rap2rifkey round.
-	for (round = 0; round < 5; ++round)
+	for (int round = 0; round < 5; ++round)
 	{
 		for (i = 0; i < 0x10; ++i)
 		{
@@ -223,15 +222,15 @@ static void make_rif(const char *path)
 				read_act_dat_and_make_rif(rap, act_dat, content_id, rif_path);
 
 				#ifdef DEBUG
-					DPRINTF("rif_path:%s\n", rif_path);
+				DPRINTF("rif_path:%s\n", rif_path);
 				#endif
 			}
+			#ifdef DEBUG
 			else
 			{
-				#ifdef DEBUG
 					DPRINTF("act.dat not found: %s\n", act_path);
-				#endif
 			}
+			#endif
 		}
 	}
 }

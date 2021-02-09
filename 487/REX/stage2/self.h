@@ -127,7 +127,7 @@ typedef struct
 } __attribute__((packed)) CONTROL_INFO; */
 
 /* typedef struct
-{s
+{
 	//uint8_t ignore[32];
 	uint8_t key[16];
 	uint8_t key_pad[16];

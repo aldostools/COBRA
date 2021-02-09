@@ -82,7 +82,7 @@ ret _##name args
 
 static INLINE void *mfsprg0()
 {
-	uint64_t ret; 
+	uint64_t ret;
 	__asm__ __volatile__("mfsprg0 %0\n\t" : "=r"(ret));
 	return (void *)ret;
 }

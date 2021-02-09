@@ -21,12 +21,15 @@ int pad_get_data(pad_data *data)
 		{		
 			len = 0x40;
 			ret = hid_mgr_read_bt(0, data, &len, 1);
-			
-			if (ret == 0)			
-				ret = len;			
-			
+
+			if (ret == 0)
+			{
+				ret = len;
+			}
+
 		} while (ret == 0);
 	}
 	
 	return ret;
 }
+
