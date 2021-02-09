@@ -53,7 +53,7 @@
 #define USB_CLASS_DATA                          0x0a
 #define USB_CLASS_VENDOR_SPECIFIC               0xff
 
-typedef struct CellUsbdLddOps 
+typedef struct CellUsbdLddOps
 {
 	const char *name;
 	int (*probe)(int dev_id);
@@ -61,7 +61,7 @@ typedef struct CellUsbdLddOps
 	int (*detach)(int dev_id);
 } CellUsbdLddOps;
 
-typedef struct UsbEndpointDescriptor 
+typedef struct UsbEndpointDescriptor
 {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -71,7 +71,7 @@ typedef struct UsbEndpointDescriptor
     uint8_t bInterval;
 } UsbEndpointDescriptor;
 
-typedef struct UsbDeviceRequest 
+typedef struct UsbDeviceRequest
 {
     uint8_t bmRequestType;
     uint8_t bRequest;

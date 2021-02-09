@@ -6,7 +6,7 @@
 #define LV1_FLASH_DEV_ID	1
 #define LV1_BDVD_DEV_ID		2
 
-typedef struct 
+typedef struct
 {
 	u64 dev_id;
 	u64 block_size;

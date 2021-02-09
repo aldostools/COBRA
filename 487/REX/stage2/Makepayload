@@ -10,12 +10,12 @@ INCLUDE		+= $(PS3DEV)/ppu/ppu/include
 LIBSDIR     =
 LIBS        =
 BUILD_TYPE  = release
-OUTPUT		= stage2.dex
+OUTPUT		= stage2.bin
 
 
 CFLAGS = -ffunction-sections -fdata-sections -Os -m64 -fno-builtin -fno-exceptions \
 			   -Os -Wall -Wno-strict-aliasing -Wno-multichar $(foreach dir,$(INCLUDE),-I$(dir)) \
-			   -DLV2 -DFIRMWARE_4_86DEX -DCFW -DUSE_LV1_PEEK_POKE -ffreestanding
+			   -DLV2 -DFIRMWARE_$(COBRA_VER) -DCFW -DUSE_LV1_PEEK_POKE -ffreestanding
 CFLAGS += --std=gnu99
 
 ifeq ($(BUILD_TYPE), debug)
@@ -38,7 +38,7 @@ endif
 LDFLAGS= -T stage2.ld -nostartfiles -nostdlib -nodefaultlibs -Wl,-static -L. $(foreach dir,$(LIBSDIR),-L$(dir)) $(LIBS) \
 	 -Wl,--gc-sections -Wl,-Map=stage2.map
 
-OBJS = start.o ps3mapi_core.o main.o crypto.o modulespatch.o config.o drm.o psp_s.o mappath.o storage_ext.o region.o psp.o permissions.o sm_ext.o  \
+OBJS = start.o ps3mapi_core.o main.o crypto.o modulespatch.o config.o psp_s.o mappath.o storage_ext.o region.o psp.o sm_ext.o  \
 	../lv2/src/usb.o ../lv2/src/patch.o ../lv2/src/interrupt.o ../lv2/src/interrupt_c.o ../lv2/src/io.o ../lv2/src/libc.o qa.o \
 	../lv2/src/libc_c.o ../lv2/src/memory.o ../lv2/src/memory_c.o ../lv2/src/thread.o ../lv2/src/thread_c.o ../lv2/src/process.o \
 	../lv2/src/synchronization.o ../lv2/src/modules.o ../lv2/src/modules_c.o ../lv2/src/storage.o ../lv2/src/object.o \
@@ -53,14 +53,29 @@ ifeq ($(BUILD_TYPE), ps2_debug)
 OBJS += laboratory.o ../debug/src/debug.o ../debug/src/printf.o ../debug/src/debug_util.o
 endif
 
+EXT = cex
+ifeq ($(COBRA_VER), 4_84DEX)
+	EXT = dex
+endif
+ifeq ($(COBRA_VER), 4_85DEX)
+	EXT = dex
+endif
+ifeq ($(COBRA_VER), 4_86DEX)
+	EXT = dex
+endif
+ifeq ($(COBRA_VER), 4_87DEX)
+	EXT = dex
+endif
+
+
 all: $(OUTPUT)
-	@cp -r $(OUTPUT) ../
-	@rm -f *.o *.elf *.map *.lzma ../lv2/src/*.o ../lv1/src/*.o ../debug/src/*.o
+	@cp -r $(OUTPUT) ../stage2.$(EXT)
+	@rm -f stage2.bin *.o *.elf *.$(COBRA_VER) *.cex *.dex *.map *.lzma ../lv2/src/*.o ../lv1/src/*.o ../debug/src/*.o
 
 objdump: $(OUTPUT)
 	@$(OBJDUMP) -D -EB -b binary -m powerpc:common64 $(OUTPUT)
 
-%.dex: %.elf
+%.bin: %.elf
 	@$(OBJCOPY) -O binary $< $@
 
 stage2.elf: $(OBJS) stage2.ld
@@ -73,4 +88,4 @@ stage2.elf: $(OBJS) stage2.ld
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	@rm -f *.o *.elf *.bin *.dex *.map *.lzma ../lv2/src/*.o ../lv1/src/*.o ../debug/src/*.o
+	@rm -f stage2.bin *.o *.elf *.bin *.$(COBRA_VER) *.cex *.dex *.map *.lzma ../lv2/src/*.o ../lv1/src/*.o ../debug/src/*.o

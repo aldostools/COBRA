@@ -14,10 +14,10 @@ _start:
 	addi 	%r4, %r4, 1b@l
 	subf. 	%r8, %r4, %r8
 	beq 	4f
-	
+
 	li	%r6, 0
 	oris	%r6, %r6, 0xBAAD
-	ori	%r6, %r6, 0xCAFE	
+	ori	%r6, %r6, 0xCAFE
 
 	lis 	%r4, __reloc_start@ha
 	addi 	%r4, %r4, __reloc_start@l
@@ -31,34 +31,30 @@ _start:
 
 2:
 	ld 	%r5, 0(%r4)
-	srdi 	%r7, %r5, 32	
+	srdi 	%r7, %r5, 32
 	cmpw 	%r7, %r6
-	bne 	3f	
+	bne 	3f
 	rldicl 	%r5, %r5, 0, 32
 	add 	%r5, %r5, %r8
-	std 	%r5, 0(%r4)	
-	
+	std 	%r5, 0(%r4)
+
 3:
 	addi 	%r4, %r4, 8
-	bdnz 	2b	
+	bdnz 	2b
 
 4:
 	std 	%r0, 0x10(%sp)
 	stdu 	%sp, -0x80(%sp)
 	std	%rtoc, 0x28(%sp)
-	
+
 	lis 	%r4, __toc@ha
 	addi 	%r4, %r4, __toc@l
-	add 	%rtoc, %r4, %r8	
-	bl	main	
-	
+	add 	%rtoc, %r4, %r8
+	bl	main
+
 	ld	%rtoc, 0x28(%sp)
 	addi 	%sp, %sp, 0x80
-	ld 	%r0, 0x10(%sp)	
+	ld 	%r0, 0x10(%sp)
 	mtlr 	%r0
 	li 	%r8, 0
-	blr	
-	
-
-
-
+	blr

@@ -1,6 +1,6 @@
  .global psp_func1
  psp_func1:
- 
+
  lbz     %r0, 0(%r4)
  addi    %r7, %r4, 0x12
  lbz     %r9, 1(%r4)
@@ -155,7 +155,3 @@
  or      %r9, %r9, %r0
  sth     %r9, 0x32(%r3)
  blr
- 
-
- 
-

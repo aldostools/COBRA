@@ -13,13 +13,13 @@
 static INLINE uint64_t get_ticks(void)
 {
 	unsigned int tbl, tbu0, tbu1;
-	do 
+	do
 	{
 		__asm__ __volatile__( "mftbu %0":"=r"( tbu0 ) );
 		__asm__ __volatile__( "mftb %0":"=r"( tbl ) );
 		__asm__ __volatile__( "mftbu %0":"=r"( tbu1 ) );
 	} while (tbu0 != tbu1);
-	
+
 	return (((uint64_t) tbu0 ) << 32) | tbl;
 }
 

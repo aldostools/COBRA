@@ -1,4 +1,4 @@
-#ifndef __LV2_OBJECT_H__ 
+#ifndef __LV2_OBJECT_H__
 #define __LV2_OBJECT_H__
 
 #include <lv2/lv2.h>
@@ -39,7 +39,7 @@ LV2_EXPORT int destroy_kernel_object(void *object_table, object_handle_t handle)
 LV2_EXPORT int destroy_shared_kernel_object(void *object_table, object_handle_t handle);
 /* Opens a kernel object. */
 LV2_EXPORT int open_kernel_object(void *object_table, uint32_t uid, void **private_kernel_object, object_handle_t *handle, uint32_t object_type);
-/* Opens a kernel object that may be shared between processes. 
+/* Opens a kernel object that may be shared between processes.
    If shared is 0 and the object is already owned by some process, the function will return an error. Otherwise it will succeed. */
 LV2_EXPORT int open_shared_kernel_object(void *object_table, uint32_t uid, void **private_kernel_object, object_handle_t *handle, uint32_t object_type, int shared);
 /* Close the kernel object handle returned by create/open kernel_object functions */

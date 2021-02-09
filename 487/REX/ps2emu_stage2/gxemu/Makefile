@@ -1,18 +1,20 @@
-CC		:= ppu-gcc
-CXX		:= ppu-g++
-LD		:= ppu-ld 
+CC			:= ppu-gcc
+CXX			:= ppu-g++
+LD			:= ppu-ld 
 OBJCOPY		:= ppu-objcopy
 OBJDUMP		:= ppu-objdump
-AR 		:= ppu-ar
+AR 			:= ppu-ar
 STRIP		:= ppu-strip
-INCLUDE		= ../common ../../ps2emu/include ../../lv1/include ../../debug/include
-LIBSDIR         =
-LIBS            =
-BUILD_TYPE      = release
+INCLUDE		=  ../common ../../ps2emu/include ../../lv2/include ../../lv1/include ../../debug/include
+INCLUDE		+= $(PS3DEV)/ppu/ppu/include
+LIBSDIR     =
+LIBS        =
+BUILD_TYPE  = release
+OUTPUT		= ps2gxemu_stage2.bin
 
 CFLAGS = -ffunction-sections -fdata-sections -Os -m64 -fno-builtin -fno-exceptions \
 			   -Os -Wall -Wno-strict-aliasing $(foreach dir,$(INCLUDE),-I$(dir)) \
-			   -DPS2EMU -DPS2GXEMU -DFIRMWARE_4_87 -ffreestanding 
+			   -DPS2EMU -DPS2GXEMU -DFIRMWARE_CEX -ffreestanding 
 CFLAGS += --std=gnu99
 
 ifeq ($(BUILD_TYPE), debug)
@@ -32,10 +34,12 @@ ifeq ($(BUILD_TYPE), debug)
 OBJS += ../../lv1/src/hvcall.o ../../lv1/src/device.o ../../debug/src/debug.o ../../debug/src/printf.o 
 endif
 
-all: ps2gxemu_stage2.bin
+all: $(OUTPUT)
+	@cp $(OUTPUT) ../../../BIN	
+	@rm -f *.o *.elf *.map ../../ps2emu/src/*.o ../../lv1/src/*.o ../../debug/src/*.o
 
-objdump: ps2gxemu_stage2.bin
-	$(OBJDUMP) -D -EB -b binary -m powerpc:common64 ps2gxemu_stage2.bin
+objdump: $(OUTPUT)
+	$(OBJDUMP) -D -EB -b binary -m powerpc:common64 $(OUTPUT)
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
@@ -50,4 +54,4 @@ ps2gxemu_stage2.elf: $(OBJS) ldscript.ld
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f *.o *.elf *.bin *.map ../../ps2emu/src/*.o ../../lv1/src/*.o ../../debug/src/*.o
+	@rm -f *.o *.elf *.bin *.map ../../ps2emu/src/*.o ../../lv1/src/*.o ../../debug/src/*.o

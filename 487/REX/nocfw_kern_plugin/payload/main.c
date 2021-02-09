@@ -18,10 +18,10 @@
 #include <lv1/patch.h>
 
 #define MAX_VSH_PLUGINS 			7
-#if defined (FIRMWARE_4_84) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_86) || defined(FIRMWARE_4_87)
+#ifdef  FIRMWARE_CEX
 #define BOOT_PLUGINS_FILE			"/dev_hdd0/boot_plugins_nocobra.txt"
 #define BOOT_PLUGINS_KERNEL_FILE	"/dev_hdd0/boot_plugins_kernel_nocobra.txt"
-#elif defined (FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85DEX) || defined(FIRMWARE_4_86DEX) || defined(FIRMWARE_4_87DEX)
+#else // FIRMWARE_DEX
 #define BOOT_PLUGINS_FILE			"/dev_hdd0/boot_plugins_nocobra_dex.txt"
 #define BOOT_PLUGINS_KERNEL_FILE	"/dev_hdd0/boot_plugins_kernel_nocobra_dex.txt"
 #endif
@@ -50,7 +50,7 @@ int read_text_line(int fd, char *line, unsigned int size, int *eof)
 		uint8_t ch;
 		uint64_t r;
 
-		if (cellFsRead(fd, &ch, 1, &r) != 0 || r != 1)
+		if (cellFsRead(fd, &ch, 1, &r) != CELL_FS_SUCCEEDED || r != 1)
 		{
 			*eof = 1;
 			break;
@@ -90,41 +90,44 @@ int read_text_line(int fd, char *line, unsigned int size, int *eof)
 	return i;
 }
 
-uint64_t load_plugin_kernel(char *path)
+static int load_plugin_kernel(char *path)
 {
 	CellFsStat stat;
-	int file;
-	int (* func)(void);
-	uint64_t read;
 
-	if(cellFsStat(path, &stat) == 0)
+	if(cellFsStat(path, &stat) == CELL_FS_SUCCEEDED)
 	{
-		if(stat.st_size > 4)
+		if(stat.st_size > 0x230)
 		{
-			if(cellFsOpen(path, CELL_FS_O_RDONLY, &file, 0, NULL, 0) == 0)
+			int file;
+			if(cellFsOpen(path, CELL_FS_O_RDONLY, &file, 0, NULL, 0) == CELL_FS_SUCCEEDED)
 			{
-				void *skprx = alloc(stat.st_size, 0x27);
+				void *skprx = malloc(stat.st_size);
+
 				if(skprx)
 				{
-					if(cellFsRead(file, skprx, stat.st_size, &read) == 0)
+					uint64_t read;
+					if(cellFsRead(file, skprx, stat.st_size, &read) == CELL_FS_SUCCEEDED)
 					{
 						f_desc_t f;
 						f.addr = skprx;
 						f.toc = (void *)MKA(TOC);
+
+						int (* func)(void);
 						func = (void *)&f;
 						func();
-						uint64_t resident = (uint64_t)skprx;
 
-						return resident;
+						return 1;
 					}
 					else
-						dealloc(skprx, 0x27);
+					{
+						free(skprx);
+					}
 				}
 			}
 		}
 	}
 
-	return -1;
+	return 0;
 }
 
 void load_boot_plugins_kernel(void)
@@ -133,7 +136,7 @@ void load_boot_plugins_kernel(void)
 	int current_slot_kernel = 0;
 	int num_loaded_kernel = 0;
 
-	if (cellFsOpen(BOOT_PLUGINS_KERNEL_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == 0)
+	if (cellFsOpen(BOOT_PLUGINS_KERNEL_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) == CELL_FS_SUCCEEDED)
 	{
 		while (num_loaded_kernel < MAX_BOOT_PLUGINS_KERNEL)
 		{
@@ -142,9 +145,7 @@ void load_boot_plugins_kernel(void)
 
 			if (read_text_line(fd, path, sizeof(path), &eof) > 0)
 			{
-				uint64_t ret = load_plugin_kernel(path);
-
-				if (ret >= 0)
+				if (load_plugin_kernel(path))
 				{
 					current_slot_kernel++;
 					num_loaded_kernel++;
@@ -198,7 +199,7 @@ void load_boot_plugins(void)
 	int current_slot = BOOT_PLUGINS_FIRST_SLOT;
 	int num_loaded = 0;
 
-	if (cellFsOpen(BOOT_PLUGINS_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) != 0)
+	if (cellFsOpen(BOOT_PLUGINS_FILE, CELL_FS_O_RDONLY, &fd, 0, NULL, 0) != CELL_FS_SUCCEEDED)
 		return;
 
 	while (num_loaded < MAX_BOOT_PLUGINS)
@@ -267,11 +268,11 @@ void copy_emus(int emu_type)
 	if (emu_type < 0 || emu_type > PS2EMU_GX)
 		return;
 
-	page_allocate_auto(NULL, 0x10000, 0x2F, (void **)&buf);
+	page_allocate_auto(NULL, 0x10000, (void **)&buf);
 
 	sprintf(name, "/dev_flash/ps2emu/%s", ps2emu_stage2[emu_type]);
 
-	if (cellFsOpen(name, CELL_FS_O_RDONLY, &src, 0, NULL, 0) == 0)
+	if (cellFsOpen(name, CELL_FS_O_RDONLY, &src, 0, NULL, 0) == CELL_FS_SUCCEEDED)
 	{
 		uint64_t size;
 
@@ -280,7 +281,7 @@ void copy_emus(int emu_type)
 
 		for(int i = 0; i < 2; i++)
 		{
-			if(cellFsOpen(ps2_files[i], CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == 0)
+			if(cellFsOpen(ps2_files[i], CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &dst, 0666, NULL, 0) == CELL_FS_SUCCEEDED)
 			{
 				cellFsWrite(dst, buf, size, &size);
 				cellFsClose(dst);
@@ -290,7 +291,7 @@ void copy_emus(int emu_type)
 
 	}
 
-	page_free(NULL, buf, 0x2F);
+	free_page(NULL, buf);
 }
 
 LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *block_dev, const char *filesystem, const char *mount_point, int unk, int read_only, int unk2, char *argv[], int argc))
@@ -310,7 +311,6 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 			cellFsUnlink(BOOT_PLUGINS_KERNEL_FILE);
 			cellFsUnlink(BOOT_PLUGINS_FILE);
 		}
-
 	}
 
 	return 0;

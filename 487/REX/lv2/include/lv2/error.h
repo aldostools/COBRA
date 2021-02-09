@@ -15,7 +15,7 @@ extern "C" {
 #define FAILED      -1
 #define UNDEFINED   -1
 
-/** The resource is temporarily unavailable. 
+/** The resource is temporarily unavailable.
  *
  * e.g. The number of threads in the system is exceeding the limit.
  */
@@ -143,4 +143,3 @@ extern "C" {
 #endif
 #endif							/* __LV2_KERNEL_ERROR_CODE_H__ */
 /*@}*/
- 

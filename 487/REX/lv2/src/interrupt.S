@@ -10,7 +10,7 @@ suspend_intr:
 	li	%r0, 2
 	mtmsrd  %r0, 1
 	blr
-	
+
 resume_intr:
 	mfsprg0 %r9
 	ld	%r3, 0x48(%r9)
@@ -19,6 +19,6 @@ resume_intr:
 	lwsync
 	mtmsrd  %r0, 1
 	blr
-	
+
 LV2_FUNCTION(spin_lock_irqsave_ex, spin_lock_irqsave_ex_symbol)
 LV2_FUNCTION(spin_unlock_irqrestore_ex, spin_unlock_irqrestore_ex_symbol)

@@ -595,4 +595,3 @@ static const char * get_scsi_cmd_name(uint8_t cmd)
 #endif
 
 #endif /* __SCSI_H__ */
-

@@ -84,7 +84,7 @@ struct ss_header
 	u64 paid;
 };
 
-struct ss_vtrm_get_status 
+struct ss_vtrm_get_status
 {
 	u32 field0;
 	u8 res1[4];
@@ -94,52 +94,52 @@ struct ss_vtrm_get_status
 	u8 res3[4];
 };
 
-struct ss_srtc_get_time 
+struct ss_srtc_get_time
 {
 	u64 field0;
 	u64 field8;
 	u64 field10;
 };
 
-struct ss_sm_set_encdec_key 
+struct ss_sm_set_encdec_key
 {
 	u8 key[24];
 	u64 key_size;
 	u64 param;
 };
 
-struct ss_sm_set_del_encdec_key 
+struct ss_sm_set_del_encdec_key
 {
 	u64 param;
 };
 
-struct ss_sm_get_rnd_number 
+struct ss_sm_get_rnd_number
 {
 	u8 field0[24];
 };
 
-struct ss_sm_drive_auth 
+struct ss_sm_drive_auth
 {
 	u64 param;
 };
 
-struct ss_sm_ps2_disc_auth 
+struct ss_sm_ps2_disc_auth
 {
 	u8 field0[56];
 };
 
-struct ss_sm_get_version 
+struct ss_sm_get_version
 {
 	u8 field0[8];
 };
 
-struct ss_sm_drive_ctrl 
+struct ss_sm_drive_ctrl
 {
 	u64 param;
 	u8 field8[16];
 };
 
-struct ss_um_update_pkg 
+struct ss_um_update_pkg
 {
 	u32 in_lpar_mem;
 	u8 res1[4];
@@ -149,9 +149,9 @@ struct ss_um_update_pkg
 	u8 res3[4];
 	u64 lpar_id;
 	u64 pkg_size;
-	union 
+	union
 	{
-		struct 
+		struct
 		{
 			u64 lpar_addr;
 			u64 size;
@@ -163,19 +163,19 @@ struct ss_um_update_pkg
 	/* u64 request_id */
 };
 
-struct ss_um_get_pkg_info 
+struct ss_um_get_pkg_info
 {
 	u32 type;
 	u8 res[4];
 	u64 version;
 };
 
-struct ss_um_get_fix_instr 
+struct ss_um_get_fix_instr
 {
 	u8 field0[12];
 };
 
-struct ss_um_get_extract_pkg 
+struct ss_um_get_extract_pkg
 {
 	u32 in_lpar_mem;
 	u8 res1[4];
@@ -273,21 +273,21 @@ struct ss_virtual_trm_mgr_decrypt_master
 	u8 msg[64];
 };
 
-struct ss_scm_get_region_data 
+struct ss_scm_get_region_data
 {
 	u64 id;
 	u64 data_size;
 	u8 data[0];
 };
 
-struct ss_scm_get_time 
+struct ss_scm_get_time
 {
 	u64 tid;
 	u64 field8;
 	u64 field10;
 };
 
-struct ss_scm_read_eprom 
+struct ss_scm_read_eprom
 {
 	u32 offset;
 	u8 res1[4];
@@ -297,7 +297,7 @@ struct ss_scm_read_eprom
 	u8 buf[0];
 };
 
-struct ss_scm_write_eprom 
+struct ss_scm_write_eprom
 {
 	u32 offset;
 	u8 res1[4];
@@ -307,7 +307,7 @@ struct ss_scm_write_eprom
 	u8 buf[0];
 };
 
-struct ss_scm_get_sc_status 
+struct ss_scm_get_sc_status
 {
 	u32 version;
 	u8 res1[4];
@@ -315,13 +315,13 @@ struct ss_scm_get_sc_status
 	u8 res2[4];
 };
 
-struct ss_iim_get_data_size 
+struct ss_iim_get_data_size
 {
 	u64 index;
 	u64 size;
 };
 
-struct ss_iim_get_data 
+struct ss_iim_get_data
 {
 	u64 index;
 	u64 buf_size;
@@ -329,38 +329,38 @@ struct ss_iim_get_data
 	/* u64 data_size */
 };
 
-struct ss_iim_get_cisd_size 
+struct ss_iim_get_cisd_size
 {
 	u64 size;
 };
 
-struct ss_aim_get_dev_type 
+struct ss_aim_get_dev_type
 {
 	u8 field0[16];
 };
 
-struct ss_aim_get_dev_id 
+struct ss_aim_get_dev_id
 {
 	u8 field0[16];
 };
 
-struct ss_aim_get_ps_code 
+struct ss_aim_get_ps_code
 {
 	u8 field0[8];
 };
 
-struct ss_aim_get_open_ps_id 
+struct ss_aim_get_open_ps_id
 {
 	u8 field0[16];
 };
 
-struct ss_usb_dongle_auth_gen_challenge 
+struct ss_usb_dongle_auth_gen_challenge
 {
 	u8 header[3];
 	u8 challenge[20];
 };
 
-struct ss_usb_dongle_auth_verify_resp 
+struct ss_usb_dongle_auth_verify_resp
 {
 	u8 header[3];
 	u16 dongle_id;

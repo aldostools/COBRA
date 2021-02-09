@@ -9,7 +9,7 @@ LV2_FUNCTION(cellFsLseek, cellFsLseek_symbol)
 LV2_FUNCTION(cellFsStat, cellFsStat_symbol)
 LV2_FUNCTION(cellFsUtime, cellFsUtime_symbol)
 LV2_FUNCTION(cellFsUnlink_internal, cellFsUnlink_internal_symbol)
-LV2_FUNCTION(cellFsUtilMount, cellFsUtilMount_symbol) 
+LV2_FUNCTION(cellFsUtilMount, cellFsUtilMount_symbol)
 LV2_FUNCTION3(cellFsUtilMount_h, cellFsUtilMount_symbol) /* We need to call this but it is hooked */
 LV2_FUNCTION(cellFsUtilUmount, cellFsUtilUmount_symbol)
 LV2_FUNCTION(cellFsUtilNewfs, cellFsUtilNewfs_symbol)

@@ -6,19 +6,19 @@
 int pad_get_data(pad_data *data)
 {
 	int ret;
-	
+
 	memset(data, 0, sizeof(pad_data));
-	
-	while ((ret = hid_mgr_read_usb(0, data, 0x40, 0)) == 0);	
-	
+
+	while ((ret = hid_mgr_read_usb(0, data, 0x40, 0)) == 0);
+
 	if (ret == 0xFFFFFFD8)
 	{
 		// USB failed, try BT now...
-		
+
 		uint16_t len;
-		
+
 		do
-		{		
+		{
 			len = 0x40;
 			ret = hid_mgr_read_bt(0, data, &len, 1);
 
@@ -29,7 +29,6 @@ int pad_get_data(pad_data *data)
 
 		} while (ret == 0);
 	}
-	
+
 	return ret;
 }
-

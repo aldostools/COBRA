@@ -20,7 +20,6 @@
 #include "storage_ext.h"
 #include "scsi.h"
 #include "config.h"
-#include "crypto.h"
 #include "mappath.h"
 #include "modulespatch.h"
 

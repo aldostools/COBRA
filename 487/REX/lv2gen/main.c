@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <time.h>
 
-#define MKA(a)	(0x8000000000000000ULL | a) 
+#define MKA(a)	(0x8000000000000000ULL | a)
 #define MAKE_JUMP_VALUE(addr, to) ((0x12 << 26) | ((((to-(uint64_t)(addr))>>2) & 0xFFFFFF) << 2))
 #define MAKE_CALL_VALUE(addr, to) ((0x12 << 26) | ((((to-(uint64_t)(addr))>>2) & 0xFFFFFF) << 2)) | 1
 
@@ -34,7 +34,7 @@ static uint64_t swap64(uint64_t data)
 static void command3(char *cmd, char *arg1, char *arg2, char *arg3)
 {
 	char buf[2048];
-	
+
 	snprintf(buf, sizeof(buf), "%s %s %s %s", cmd, arg1, arg2, arg3);
 	system(buf);
 }
@@ -42,7 +42,7 @@ static void command3(char *cmd, char *arg1, char *arg2, char *arg3)
 static void command8(char *cmd, char *arg1, char *arg2, char *arg3, char *arg4, char *arg5, char *arg6, char *arg7, char *arg8)
 {
 	char buf[2048];
-	
+
 	snprintf(buf, sizeof(buf), "%s %s %s %s %s %s %s %s %s", cmd, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 	system(buf);
 }
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	command3("scetool", "--decrypt", argv[1], "lv2_kernel.elf");	
+	command3("scetool", "--decrypt", argv[1], "lv2_kernel.elf");
 	FILE *kernel = fopen("lv2_kernel.elf", "rb");
 
 	if(!kernel)
@@ -65,12 +65,12 @@ int main(int argc, char **argv)
 	}
 
 	fseek(kernel, 0, SEEK_END);
-	
+
 	int kernel_len = ftell(kernel);
 	fseek(kernel, 0, SEEK_SET);
 	uint8_t *kernel_buf = (uint8_t *)malloc(kernel_len + 1);
 	fread(kernel_buf, kernel_len, 1, kernel);
-	
+
 	FILE *plugin = fopen(argv[4], "rb");
 	if(!plugin)
 	{
@@ -79,12 +79,12 @@ int main(int argc, char **argv)
 	}
 
 	fseek(plugin, 0, SEEK_END);
-	
+
 	int plugin_len = ftell(plugin);
 	printf("plugin_len:%x\n", plugin_len);
 
 	fseek(plugin, 0, SEEK_SET);
-	uint8_t *plugin_buf = (uint8_t *)malloc(plugin_len);	
+	uint8_t *plugin_buf = (uint8_t *)malloc(plugin_len);
 	fread(plugin_buf, plugin_len, 1, plugin);
 	fclose(plugin);
 
@@ -97,14 +97,14 @@ int main(int argc, char **argv)
 		printf("no payload found!");
 		exit(0);
 	}
-	
+
 	fseek(payload, 0, SEEK_END);
-	
+
 	int payload_len = ftell(payload);
 	printf("payload_len:%x\n", payload_len);
 
 	fseek(payload, 0, SEEK_SET);
-	
+
 	uint8_t *buf = (uint8_t *)malloc(payload_len);
 	fread(buf, payload_len, 1, payload);
 	uint32_t stage0_addr = 0;
@@ -112,23 +112,22 @@ int main(int argc, char **argv)
 	uint32_t inst = MAKE_JUMP_VALUE(stage0_addr, 0x3d98);
  	inst = swap32(inst);
 	memcpy(kernel_buf + 0x10000 + stage0_addr, &inst, 0x4);
-	
+
 	uint64_t opcode = 0x386000014e800020;
 	opcode = swap64(opcode);
 	memcpy(kernel_buf + 0x10000 + 0x3d90, &opcode, 0x8);
 	memcpy(kernel_buf + 0x13d98, buf, payload_len);
-	
+
 	FILE *tmp = fopen("temp.elf", "wb");
 	fwrite(kernel_buf, kernel_len,1,tmp);
 	fclose(tmp);
 	free(kernel_buf);
 	free(buf);
-	
+
 	command8("scetool", "--template", argv[1], "--sce-type=SELF", "--compress-data=TRUE", "--self-type=LV2", "--encrypt", "temp.elf", "lv2_kernel.self.cobra.self");
-	
+
 	remove("temp.elf");
 	remove("lv2_kernel.elf");
 
 	return 0;
 }
-	

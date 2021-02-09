@@ -19,20 +19,20 @@ LV2_EXPORT int sm_set_fan_policy_internal(uint64_t *sysm_obj, uint8_t unk, uint8
 
 static INLINE void sm_get_temperature(int id, uint32_t *temp)
 {
-	memcpy(&sysm_obj, (void *)SYSM_OBJ_OFFSET, 8); 
+	memcpy(&sysm_obj, (void *)SYSM_OBJ_OFFSET, 8);
 	sm_get_temperature_internal(sysm_obj, id, temp, 1000000);
 	*temp >>= 24; // return °C
 }
 
 static INLINE void sm_get_fan_policy(uint8_t id, uint8_t *st, uint8_t *mode, uint8_t *speed, uint8_t *unk)
 {
-	memcpy(&sysm_obj, (void *)SYSM_OBJ_OFFSET, 8); 
+	memcpy(&sysm_obj, (void *)SYSM_OBJ_OFFSET, 8);
 	sm_get_fan_policy_internal(sysm_obj, id, st, mode, speed, unk, 1000000);
 }
 
 static INLINE int sm_set_fan_policy(uint8_t unk, uint8_t mode, uint8_t speed)
 {
-	memcpy(&sysm_obj, (void *)SYSM_OBJ_OFFSET, 8); 
+	memcpy(&sysm_obj, (void *)SYSM_OBJ_OFFSET, 8);
 	sm_set_fan_policy_internal(sysm_obj, unk, mode, speed);
 
 	return 0;

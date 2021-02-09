@@ -1,6 +1,6 @@
 CC			:= ppu-gcc
 CXX			:= ppu-g++
-LD			:= ppu-ld 
+LD			:= ppu-ld
 OBJCOPY		:= ppu-objcopy
 AR 			:= ppu-ar
 STRIP		:= ppu-strip
@@ -15,7 +15,7 @@ TARGET		= payload
 
 CFLAGS = -ffunction-sections -fdata-sections -Os -m64 -fno-builtin -fno-exceptions \
 			   -Os -Wall $(foreach dir,$(INCLUDE),-I$(dir)) \
-			   -DLV2 -DFIRMWARE_4_87DEX -ffreestanding -Wno-strict-aliasing -DUSE_LV1_PEEK_POKE 
+			   -DLV2 -DFIRMWARE_4_87DEX -ffreestanding -Wno-strict-aliasing -DUSE_LV1_PEEK_POKE
 CFLAGS += --std=gnu99
 LDFLAGS=-nostartfiles -nostdlib -mbig-endian
 LDFLAGS= -T $(TARGET).ld -nostartfiles -nostdlib -nodefaultlibs -Wl,-static -Wl,-s -L. $(foreach dir,$(LIBSDIR),-L$(dir)) $(LIBS) -Wl,--gc-sections -Wl
@@ -25,13 +25,13 @@ OBJS = start.o main.o \
 	../../lv2/src/libc_c.o ../../lv2/src/memory.o ../../lv2/src/memory_c.o ../../lv2/src/thread.o ../../lv2/src/thread_c.o ../../lv2/src/process.o \
 	../../lv2/src/synchronization.o ../../lv2/src/modules.o ../../lv2/src/modules_c.o ../../lv2/src/storage.o ../../lv2/src/object.o \
 	../../lv2/src/security.o ../../lv2/src/time.o ../../lv2/src/hid.o ../../lv2/src/pad.o ../../lv2/src/syscall.o \
-	../../lv1/src/hvcall.o ../../lv1/src/stor.o ../../lv1/src/device.o 
+	../../lv1/src/hvcall.o ../../lv1/src/stor.o ../../lv1/src/device.o
 
 all: $(TARGET).bin
 	@mv payload.bin payload_D.bin
-	
+
 %.bin: %.elf
-	$(OBJCOPY) -O binary $< $@	
+	$(OBJCOPY) -O binary $< $@
 	@rm -f *.o *.elf ../../lv1/src/*.o ../../lv2/src/*.o
 	@cp $(TARGET).bin ../../../BIN
 

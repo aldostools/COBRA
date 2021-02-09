@@ -11,7 +11,7 @@ get_time_seconds:
 	std	%rtoc, 0x28(%sp)
 	MEM_BASE(%r0)
 	LOAD_LABEL(%rtoc, %r0, TOC)
-1: 
+1:
 	mftb	%r9
 	cmpwi	%r9, 0
 	beq	1b

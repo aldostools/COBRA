@@ -5,6 +5,7 @@
 
 #if defined(FIRMWARE_4_84) || defined(FIRMWARE_4_85) || defined(FIRMWARE_4_86) || defined(FIRMWARE_4_87)
 
+#define FIRMWARE_CEX
 #define PS3MAPI_FW_TYPE									"CEX COBRA"
 #define PS3MAPI_IDPS_1									0x80000000003E2E30ULL
 #define PS3MAPI_IDPS_2									0x8000000000474AF4ULL
@@ -292,6 +293,7 @@
 
 #elif defined(FIRMWARE_4_84DEX) || defined(FIRMWARE_4_85DEX) || defined(FIRMWARE_4_86DEX) || defined(FIRMWARE_4_87DEX)
 
+#define FIRMWARE_DEX
 #define	PS3MAPI_FW_TYPE									"DEX COBRA"
 #define	PS3MAPI_IDPS_1									0x8000000000409A30ULL
 #define	PS3MAPI_IDPS_2									0x800000000049CAF4ULL

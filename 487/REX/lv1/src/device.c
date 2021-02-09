@@ -32,9 +32,9 @@ int map_dma_mem(int bus_id, int dev_id, void *start, size_t len, u64 *r_bus_addr
 
 	if (result)
 		return result;
-	
+
 	result = lv1_map_device_dma_region(bus_id, dev_id, map_start, bus_addr, map_end - map_start, flags);
-	if (result) 
+	if (result)
 	{
 		lv1_free_device_dma_region(bus_id, dev_id, bus_addr);
 		return result;
@@ -90,7 +90,7 @@ int find_device_by_type(int type, int index, int *pbus_id, int *pdev_id, int *pi
 		printf("Bus #%ld id %ld type %ld num_dev %ld\n", bus_ndx, bus_id, bus_type, num_dev);
 		u64 dev_ndx;
 
-		for (dev_ndx=0; dev_ndx<num_dev; dev_ndx++) 
+		for (dev_ndx=0; dev_ndx<num_dev; dev_ndx++)
 		{
 			s64 dev_id=0, dev_type=0, dev_intr=0;
 
@@ -108,10 +108,10 @@ int find_device_by_type(int type, int index, int *pbus_id, int *pdev_id, int *pi
 				dev_intr = -1;
 
 			printf("- Dev #%ld id %ld type %ld intr %ld\n", dev_ndx, dev_id, dev_type, dev_intr);
-			
-			if (dev_type == type) 
+
+			if (dev_type == type)
 			{
-				if (index) 
+				if (index)
 				{
 					index--;
 					continue;

@@ -6,20 +6,20 @@
 #define MEM_BASE(dest) \
 	li dest, 1; \
 	rldicr dest, dest, 63, 0;
-	
+
 #define LOAD_LABEL(dest, source, address) \
 	oris	dest, source, (address)@h; \
 	ori	dest, dest, (address)@l;
-	
+
 #define LV2_FUNCTION(name, address) \
 	.section .name.text, "ax"; \
 	.global name; \
 	.align 3; \
 	name:; \
 	.quad	0x8000000000000000 | address, 0x8000000000000000 | TOC; \
-	.previous; 
+	.previous;
 
-	
+
 #define LV2_FUNCTION2(name, address) \
 	.section .name.text, "ax"; \
 	.global name; \
@@ -39,7 +39,7 @@
 	mtlr	%r0; \
 	blr; \
 	.previous;
-	
+
 #define LV2_FUNCTION3(name, address) \
 	.section .name.text, "ax"; \
 	.global name; \

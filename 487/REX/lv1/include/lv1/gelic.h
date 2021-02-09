@@ -29,7 +29,7 @@ Portions taken from Linux (drivers/net/ps3_gelic_net.h):
 
 
  /* RX descriptor data_status bits */
-enum gelic_descr_rx_status 
+enum gelic_descr_rx_status
 {
 	GELIC_DESCR_RXDMADU		= 0x80000000, /* destination MAC addr unknown */
 	GELIC_DESCR_RXLSTFBF	= 0x40000000, /* last frame buffer            */
@@ -51,7 +51,7 @@ enum gelic_descr_rx_status
 	(GELIC_DESCR_RXIPCHK | GELIC_DESCR_RXTCPCHK)
 
  /* TX descriptor data_status bits */
-enum gelic_descr_tx_status 
+enum gelic_descr_tx_status
 {
 	GELIC_DESCR_TX_TAIL	= 0x00000001, /* gelic treated this
 								       * descriptor was end of
@@ -60,7 +60,7 @@ enum gelic_descr_tx_status
 };
 
 /* RX descriptor data error bits */
-enum gelic_descr_rx_error 
+enum gelic_descr_rx_error
 {
 	/* bit 31 reserved */
 	GELIC_DESCR_RXALNERR	= 0x40000000, /* alignement error 10/100M */
@@ -83,7 +83,7 @@ enum gelic_descr_rx_error
 	(GELIC_DESCR_RXIPCHKERR | GELIC_DESCR_RXTCPCHKERR)
 
 /* DMA command and status (RX and TX)*/
-enum gelic_descr_dma_status 
+enum gelic_descr_dma_status
 {
 	GELIC_DESCR_DMA_COMPLETE            = 0x00000000, /* used in tx */
 	GELIC_DESCR_DMA_BUFFER_FULL         = 0x00000000, /* used in rx */
@@ -98,7 +98,7 @@ enum gelic_descr_dma_status
 #define GELIC_DESCR_DMA_STAT_MASK	(0xf0000000)
 
 /* tx descriptor command and status */
-enum gelic_descr_tx_dma_status 
+enum gelic_descr_tx_dma_status
 {
 	/* [19] */
 	GELIC_DESCR_TX_DMA_IKE			= 0x00080000, /* IPSEC off */
@@ -129,7 +129,7 @@ enum gelic_descr_tx_dma_status
 	(GELIC_DESCR_DMA_CARDOWNED | GELIC_DESCR_TX_DMA_IKE | \
 	GELIC_DESCR_TX_DMA_UDP_CHKSUM)
 
-enum gelic_descr_rx_dma_status 
+enum gelic_descr_rx_dma_status
 {
 	/* [ 1 ] */
 	GELIC_DESCR_RX_DMA_CHAIN_END	= 0x00000002, /* DMA terminated
@@ -138,7 +138,7 @@ enum gelic_descr_rx_dma_status
 };
 
 /* for lv1_net_control */
-enum gelic_lv1_net_control_code 
+enum gelic_lv1_net_control_code
 {
 	GELIC_LV1_GET_MAC_ADDRESS		= 1,
 	GELIC_LV1_GET_ETH_PORT_STATUS	= 2,
@@ -152,21 +152,21 @@ enum gelic_lv1_net_control_code
 };
 
 /* for GELIC_LV1_WOL_MAGIC_PACKET */
-enum gelic_lv1_wol_mp_arg 
+enum gelic_lv1_wol_mp_arg
 {
 	GELIC_LV1_WOL_MP_DISABLE	= 0,
 	GELIC_LV1_WOL_MP_ENABLE		= 1,
 };
 
 /* for GELIC_LV1_WOL_{ADD,DELETE}_MATCH_ADDR */
-enum gelic_lv1_wol_match_arg 
+enum gelic_lv1_wol_match_arg
 {
 	GELIC_LV1_WOL_MATCH_INDIVIDUAL	= 0,
 	GELIC_LV1_WOL_MATCH_ALL			= 1,
 };
 
 /* status returened from GET_ETH_PORT_STATUS */
-enum gelic_lv1_ether_port_status 
+enum gelic_lv1_ether_port_status
 {
 	GELIC_LV1_ETHER_LINK_UP		= 0x0000000000000001L,
 	GELIC_LV1_ETHER_FULL_DUPLEX	= 0x0000000000000002L,
@@ -178,7 +178,7 @@ enum gelic_lv1_ether_port_status
 	GELIC_LV1_ETHER_SPEED_MASK	= 0x0000000000000070L,
 };
 
-enum gelic_lv1_vlan_index 
+enum gelic_lv1_vlan_index
 {
 	/* for outgoing packets */
 	GELIC_LV1_VLAN_TX_ETHERNET_0	= 0x0000000000000002L,
@@ -189,7 +189,7 @@ enum gelic_lv1_vlan_index
 	GELIC_LV1_VLAN_RX_WIRELESS		= 0x0000000000000013L,
 };
 
-enum gelic_lv1_phy 
+enum gelic_lv1_phy
 {
 	GELIC_LV1_PHY_ETHERNET_0		= 0x0000000000000002L,
 };
@@ -197,14 +197,14 @@ enum gelic_lv1_phy
 /* size of hardware part of gelic descriptor */
 #define GELIC_DESCR_SIZE	(32)
 
-enum gelic_port_type 
+enum gelic_port_type
 {
 	GELIC_PORT_ETHERNET_0	= 0,
 	GELIC_PORT_WIRELESS	= 1,
 	GELIC_PORT_MAX
 };
 
-struct gelic_descr 
+struct gelic_descr
 {
 	/* as defined by the hardware */
 	u32 buf_addr;

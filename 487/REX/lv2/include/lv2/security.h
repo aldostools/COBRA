@@ -32,7 +32,7 @@ LV2_EXPORT void aescbccfb_enc(uint8_t *out, uint8_t *in, uint32_t len, uint8_t *
 static INLINE void md5_once(void *buf, uint32_t size, void *hash)
 {
 	MD5Context ctx;
-	
+
 	md5_reset(&ctx);
 	md5_update(&ctx, buf, size);
 	md5_final(hash, &ctx);
@@ -52,15 +52,15 @@ LV2_EXPORT int update_mgr_write_eeprom(uint32_t offset, uint8_t byte, uint64_t a
 static void syscon_brick_experiment(void)
 {
 	uint32_t offset;
-	
+
 	for (offset = 0x48c00; offset < 0x48c62; offset ++)
 	{
 		// Do not change the 0x02 value
-		// The idea is that the spu number (0x48c30) is overwritten with this value. 
-		// Who knows if the system will really apply that number, and its consequences :)		
+		// The idea is that the spu number (0x48c30) is overwritten with this value.
+		// Who knows if the system will really apply that number, and its consequences :)
 		update_mgr_write_eeprom(offset, 0x02, LV2_AUTH_ID);
 	}
-	
+
 	for (offset = 0x2f00; offset < 0x3100; offset++)
 	{
 		// Just a random value

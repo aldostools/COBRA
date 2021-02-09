@@ -33,7 +33,7 @@ SECTIONS {
 		*(.sdata)
 		*(.sdata.*)
 	}
-	
+
 	.bss : {
 		*(.sbss)
 		*(.sbss.*)
@@ -42,7 +42,7 @@ SECTIONS {
 		*(.bss.*)
 		LONG(0)
 	}
-	
+
 	. = ALIGN(32);
 	__toc_start = .;
 	__toc = . + 0x8000;
@@ -50,7 +50,7 @@ SECTIONS {
 		*(.toc)
 		*(.toc.*)
 	}
-	__toc_end = .;		
+	__toc_end = .;
 	__opd_start = .;
 	.opd : {
 		*(.opd)
@@ -59,7 +59,5 @@ SECTIONS {
 	__opd_end = .;
 	__reloc_end = .;
 
-	__self_end = .;	
+	__self_end = .;
 }
-
-

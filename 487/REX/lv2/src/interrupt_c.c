@@ -2,7 +2,7 @@
 #include <lv2/interrupt.h>
 #include <lv2/thread.h>
 
-uint64_t spin_lock_irqsave(void) 
+uint64_t spin_lock_irqsave(void)
 {
 	uint8_t *ta = (uint8_t *)get_current_thread();
 	return spin_lock_irqsave_ex(ta + 0x28);

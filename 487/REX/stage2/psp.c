@@ -543,4 +543,3 @@ int sys_psp_sony_bug(uint32_t *mips_registers, void *unk, uint32_t mips_PC)
 }
 
 #endif
-

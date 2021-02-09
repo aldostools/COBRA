@@ -10,7 +10,7 @@ get_current_process:
 	beq	cr7, loc_0
 	ld	%r3, 0xB0(%r3)
 	blr
-loc_0:                               
+loc_0:
 	mfsprg0 %r9
 	ld	%r11, 0x68(%r9)
 	li	%r3, 0

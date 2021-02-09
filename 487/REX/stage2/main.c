@@ -23,18 +23,14 @@
 #include <lv1/patch.h>
 #include "common.h"
 #include "syscall8.h"
-//#include "cobra.h"
 #include "modulespatch.h"
 
 #include "mappath.h"
 #include "storage_ext.h"
 #include "region.h"
-#include "permissions.h"
 #include "psp.h"
 #include "config.h"
-#include "drm.h"
 #include "sm_ext.h"
-#include "laboratory.h"
 #include "ps3mapi_core.h"
 
 #include "kernel_payload.h"
@@ -239,7 +235,6 @@ static inline void ps3mapi_unhook_all(void)
 	#ifdef FAN_CONTROL
 	unhook_all_fan_patches();
 	#endif
-	//unhook_all_permissions();
 }
 
 #ifdef MAKE_RIF
@@ -713,17 +708,6 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		//--------------------------
-		// PERMISSIONS
-		//--------------------------
-		case SYSCALL8_OPCODE_GET_ACCESS:
-			return sys_permissions_get_access();
-		break;
-
-		case SYSCALL8_OPCODE_REMOVE_ACCESS:
-			return sys_permissions_remove_access();
-		break;
-
-		//--------------------------
 		// CONFIG
 		//--------------------------
 		case SYSCALL8_OPCODE_READ_COBRA_CONFIG:
@@ -860,10 +844,6 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		//--------------------------
 		// MISC
 		//--------------------------
-		case SYSCALL8_OPCODE_DRM_GET_DATA:
-			return sys_drm_get_data((void *)param1, param2);
-		break;
-
 		case SYSCALL8_OPCODE_SEND_POWEROFF_EVENT:
 			return sys_sm_ext_send_poweroff_event((int)param1);
 		break;
@@ -872,14 +852,31 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 			return disable_cobra_stage2();
 		break;
 
-		case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
-			return ENOSYS; //sys_vsh_spoof_version((char *)param1); // deprecated
+		//case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
+		//	return ENOSYS; //sys_vsh_spoof_version((char *)param1); // deprecated
+		//break;
+
+		//case SYSCALL8_OPCODE_DRM_GET_DATA:
+		//	return sys_drm_get_data((void *)param1, param2); // deprecated
+		//break;
+
+		//case SYSCALL8_OPCODE_GET_ACCESS:
+		//	return sys_permissions_get_access();
+		//break;
+
+		//case SYSCALL8_OPCODE_REMOVE_ACCESS:
+		//	return sys_permissions_remove_access();
+		//break;
+
+		case SYSCALL8_OPCODE_GET_ACCESS:
+		case SYSCALL8_OPCODE_REMOVE_ACCESS:
+		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
+			return 0; //return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5); // deprecated
 		break;
 
-		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
-			//return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5); // deprecated
-			return 0;
-		break;
+		case SYSCALL8_OPCODE_DRM_GET_DATA:
+		case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
+			return ENOSYS; // deprecated opcodes
 
 #ifdef DEBUG
 		case SYSCALL8_OPCODE_DUMP_STACK_TRACE:
@@ -960,13 +957,11 @@ int main(void)
 	if(vsh_process) get_vsh_offset();
 	storage_ext_init();
 	modules_patch_init();
-	drm_init();
 
 	apply_kernel_patches();
 	map_path_patches(1);
 	storage_ext_patches();
 	region_patches();
-	permissions_patches();
 	#ifdef FAN_CONTROL
 	fan_patches();
 	#endif

@@ -825,7 +825,6 @@ _GLOBAL(_##API_NAME)				\
 	blr;					\
 	.previous
 
-	
 
 /* the lv1 underscored call definitions expand here */
 

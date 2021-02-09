@@ -1,6 +1,6 @@
 CC 			= gcc
 OUTPUT 		= lv2gen
-OBJS 		= main.o 
+OBJS 		= main.o
 CFLAGS 		= -Wall -I. --std=gnu99
 LDFLAGS 	= -L. -lstdc++
 

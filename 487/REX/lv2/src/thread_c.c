@@ -24,7 +24,7 @@ int ppu_user_thread_create(process_t process, thread_t *thread, void *entry, uin
 	{
 		return ENOMEM;
 	}
-	
+
 	if (flags & PPU_THREAD_CREATE_JOINABLE)
 	{
 		translated_flags = 0x10003;
@@ -33,13 +33,13 @@ int ppu_user_thread_create(process_t process, thread_t *thread, void *entry, uin
 	{
 		translated_flags = 0x10001;
 	}
-	
+
 	if (flags & PPU_THREAD_CREATE_INTERRUPT)
 	{
 		translated_flags |= 0x4000;
 	}
-	
-	spr0 = mfsprg0();	
+
+	spr0 = mfsprg0();
 	*thread = create_user_thread2((void *)spr0[0x48/8], entry, arg, 200, user_stack, stacksize, process, translated_flags, threadname);
 
 	if (!(thread))
@@ -53,8 +53,8 @@ int ppu_user_thread_create(process_t process, thread_t *thread, void *entry, uin
 
 	if (!(flags & PPU_THREAD_CREATE_INTERRUPT))
 	{
-		run_thread(*thread);		
+		run_thread(*thread);
 	}
-	
+
 	return 0;
 }
