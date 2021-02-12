@@ -853,7 +853,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		//case SYSCALL8_OPCODE_VSH_SPOOF_VERSION:
-		//	return ENOSYS; //sys_vsh_spoof_version((char *)param1); // deprecated
+		//	return sys_vsh_spoof_version((char *)param1); // deprecated
 		//break;
 
 		//case SYSCALL8_OPCODE_DRM_GET_DATA:
@@ -868,10 +868,14 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		//	return sys_permissions_remove_access();
 		//break;
 
+		//case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
+		//	return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5);
+		//break;
+
 		case SYSCALL8_OPCODE_GET_ACCESS:
 		case SYSCALL8_OPCODE_REMOVE_ACCESS:
 		case SYSCALL8_OPCODE_COBRA_USB_COMMAND:
-			return 0; //return sys_cobra_usb_command(param1, param2, param3, (void *)param4, param5); // deprecated
+			return 0;  // deprecated opcodes
 		break;
 
 		case SYSCALL8_OPCODE_DRM_GET_DATA:

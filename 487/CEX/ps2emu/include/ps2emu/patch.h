@@ -1997,10 +1997,10 @@ ret _##name args
 ret name args; \
 ret _##name args
 
-typedef struct function_descriptor
+typedef struct function_descriptor 
 {
 	void	*addr;
-	void    *toc;
+	void    *toc;	
 } f_desc_t;
 
 void 	clear_icache(void *addr, uint64_t size);
@@ -2017,7 +2017,7 @@ static INLINE void *get_function_ptr(uint64_t addr, f_desc_t *f)
 static INLINE void make_long_jump(void *addr, uint64_t to)
 {
 	uint32_t *ins = (uint32_t *)addr;
-
+	
 	ins[0] = LIS(0, ((to>>16)&0xFFFF));
 	ins[1] = ORI(0, 0, (to&0xFFFF));
 	ins[2] = MTCTR(0);
@@ -2027,7 +2027,7 @@ static INLINE void make_long_jump(void *addr, uint64_t to)
 static INLINE void make_long_call(void *addr, uint64_t to)
 {
 	uint32_t *ins = (uint32_t *)addr;
-
+	
 	ins[0] = LIS(0, ((to>>16)&0xFFFF));
 	ins[1] = ORI(0, 0, (to&0xFFFF));
 	ins[2] = MTCTR(0);
@@ -2037,11 +2037,11 @@ static INLINE void make_long_call(void *addr, uint64_t to)
 static INLINE void make_long_jump_with_inst(void *addr, uint64_t to, uint32_t *inst)
 {
 	uint32_t *ins = (uint32_t *)addr;
-
+		
 	ins[0] = LIS(0, ((to>>16)&0xFFFF));
 	ins[1] = ORI(0, 0, (to&0xFFFF));
 	ins[2] = MTCTR(0);
-
+	
 	for (int i = 0, j = 3; i < 4; i++, j++)
 	{
 		if (inst[i] == MFLR(0))
@@ -2051,43 +2051,43 @@ static INLINE void make_long_jump_with_inst(void *addr, uint64_t to, uint32_t *i
 			ins[j] = ORI(0, 0, ((uint64_t)(ins+9)&0xFFFF));
 		}
 		else
-		{
+		{			
 			ins[j] = inst[i];
 		}
-
+		
 		if (i == 3 && j == 6)
 		{
 			ins[7] = NOP;
 		}
 	}
-
+		
 	ins[8] = BCTR;
 }
 
 static INLINE void make_long_jump_with_inst2(void *addr, uint64_t to, uint32_t *inst)
 {
 	uint32_t *ins = (uint32_t *)addr;
-
+		
 	ins[0] = LIS(0, ((to>>16)&0xFFFF));
 	ins[1] = ORI(0, 0, (to&0xFFFF));
 	ins[2] = MTCTR(0);
-
+	
 	for (int i = 0, j = 3; i < 4; i++, j++)
 	{
-		ins[j] = inst[i];
+		ins[j] = inst[i];		
 	}
-
+		
 	ins[7] = BCTR;
 }
 
 static INLINE void make_long_call_with_inst(void *addr, uint64_t to, uint32_t *inst)
 {
 	uint32_t *ins = (uint32_t *)addr;
-
+	
 	ins[0] = LIS(0, ((to>>16)&0xFFFF));
 	ins[1] = ORI(0, 0, (to&0xFFFF));
 	ins[2] = MTCTR(0);
-
+	
 	for (int i = 0, j = 3; i < 4; i++, j++)
 	{
 		if (inst[i] == MFLR(0))
@@ -2097,22 +2097,22 @@ static INLINE void make_long_call_with_inst(void *addr, uint64_t to, uint32_t *i
 			ins[j] = ORI(0, 0, ((uint64_t)(ins+9)&0xFFFF));
 		}
 		else if (inst[i] == MFLR(11))
-		{
+		{			
 			ins[j] = LIS(11, (((uint64_t)(ins+9)>>16)&0xFFFF));
 			j++;
 			ins[j] = ORI(11, 11, ((uint64_t)(ins+9)&0xFFFF));
 		}
 		else
-		{
+		{			
 			ins[j] = inst[i];
 		}
-
+		
 		if (i == 3 && j == 6)
 		{
 			ins[7] = NOP;
 		}
 	}
-
+	
 	ins[8] = BCTRL;
 }
 
@@ -2128,7 +2128,7 @@ static INLINE void *hook_function(uint64_t func_addr, void *newfunc, f_desc_t *f
 	f_desc_t *g = (f_desc_t *)newfunc;
 	uint32_t *inst = (uint32_t *)func_addr;
 	uint32_t *orig_call = &((uint32_t *)g->addr)[19]; // WARNING: relies on HOOKED_FUNCTION not being changed
-
+		
 	make_long_jump_with_inst2(&orig_call[0], func_addr+16, inst);
 	clear_icache(orig_call, 36);
 	change_function(func_addr, newfunc);
@@ -2141,11 +2141,11 @@ static INLINE void hook_function_with_precall(uint64_t func_addr, void *newfunc,
 {
 	if (nparams > 8)
 		return;
-
+	
 	f_desc_t *f = (f_desc_t *)newfunc;
 	uint32_t *inst = (uint32_t *)func_addr;
-	uint32_t *orig_call = &((uint32_t *)f->addr)[2+nparams]; // WARNING: relies on HOOKED_FUNCTION_PRECALL_N not being changed
-
+	uint32_t *orig_call = &((uint32_t *)f->addr)[2+nparams]; // WARNING: relies on HOOKED_FUNCTION_PRECALL_N not being changed	
+	
 	make_long_call_with_inst(&orig_call[0], func_addr+16, inst);
 	clear_icache(orig_call, 36);
 	change_function(func_addr, newfunc);
@@ -2160,11 +2160,11 @@ static INLINE void hook_function_with_postcall(uint64_t func_addr, void *newfunc
 {
 	if (nparams > 8)
 		return;
-
+	
 	f_desc_t *f = (f_desc_t *)newfunc;
 	uint32_t *inst = (uint32_t *)func_addr;
-	uint32_t *orig_call = &((uint32_t *)f->addr)[16+(nparams*2)]; // WARNING: relies on HOOKED_FUNCTION_POST_CALL_N not being changed
-
+	uint32_t *orig_call = &((uint32_t *)f->addr)[16+(nparams*2)]; // WARNING: relies on HOOKED_FUNCTION_POST_CALL_N not being changed	
+	
 	make_long_call_with_inst(&orig_call[0], func_addr+16, inst);
 	clear_icache(orig_call, 36);
 	change_function(func_addr, newfunc);
@@ -2174,11 +2174,11 @@ static INLINE void hook_function_with_cond_postcall(uint64_t func_addr, void *ne
 {
 	if (nparams > 8)
 		return;
-
+	
 	f_desc_t *f = (f_desc_t *)newfunc;
 	uint32_t *inst = (uint32_t *)func_addr;
-	uint32_t *orig_call = &((uint32_t *)f->addr)[19+(nparams*2)]; // WARNING: relies on HOOKED_FUNCTION_COND_POST_CALL_N not being changed
-
+	uint32_t *orig_call = &((uint32_t *)f->addr)[19+(nparams*2)]; // WARNING: relies on HOOKED_FUNCTION_COND_POST_CALL_N not being changed	
+	
 	make_long_call_with_inst(&orig_call[0], func_addr+16, inst);
 	clear_icache(orig_call, 36);
 	change_function(func_addr, newfunc);
@@ -2198,3 +2198,4 @@ uint64_t call_hooked_function(void *func, uint64_t a1, uint64_t a2, uint64_t a3,
 
 
 #endif /* __PS2EMU_PATCH_H__ */
+

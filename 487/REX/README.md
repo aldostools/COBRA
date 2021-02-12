@@ -24,9 +24,9 @@ This repository will have constant changes.
     . Added sm_get_temperature patch in kernel (by Evilnat)
     . Added sm_get_fan_policy patch in kernel (by Evilnat)
     . Added sm_set_fan_policy patch in kernel (by Evilnat)
+    . Fixed black screen on CFW2OFW games (by Evilnat)
     . Fixed Control FAN payload, avoids loading previous mode (by Evilnat)
     . Disable stage2.bin while Recovery Menu is loaded (by haxxxen)
-    
 ###### To do:
     . reActPSN
     . QA flag

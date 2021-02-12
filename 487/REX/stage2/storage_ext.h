@@ -67,5 +67,9 @@ int save_file(const char *path, void *buf, size_t size);
 void unhook_all_storage_ext(void);
 void copy_emus(int emu_type);
 
+#ifdef DO_CFW2OFW_FIX
+void restore_BD(void);
+#endif
+
 #endif /* __STORAGE_EXT_H__ */
 

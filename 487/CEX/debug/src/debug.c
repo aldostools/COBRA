@@ -42,14 +42,14 @@ static int dev_id;
 
 static u64 bus_addr;
 
-struct ethhdr
+struct ethhdr 
 {
 	uint8_t dest[6];
 	uint8_t src[6];
 	uint16_t type;
 } __attribute__((packed));
 
-struct vlantag
+struct vlantag 
 {
 	uint16_t vlan;
 	uint16_t subtype;
@@ -69,7 +69,7 @@ struct iphdr
 	uint32_t dest;
 } __attribute__((packed));
 
-struct udphdr
+struct udphdr 
 {
 	uint16_t src;
 	uint16_t dest;
@@ -86,7 +86,7 @@ static char *pmsg;
 
 #define MAX_MESSAGE_SIZE 1000
 
-struct debug_block
+struct debug_block 
 {
 	volatile struct gelic_descr descr;
 	uint8_t pkt[1520];
@@ -116,9 +116,9 @@ void debug_uninstall(void)
 
 LV2_SYSCALL(int, ttyWrite, (int channel, const char* message, int length, int* written))
 {
-	debug_print(message, length);
+	debug_print(message, length);	
 	if (written)
-		*written = length;
+		*written = length;	
 
 	return 0;
 }
@@ -174,7 +174,7 @@ int64_t debug_init(void)
 	mac <<= 16;
 
 	h_eth = (struct ethhdr*)dbg->pkt;
-
+	
 	memset(&h_eth->dest, 0xff, 6);
 	memcpy(&h_eth->src, &mac, 6);
 
@@ -184,7 +184,7 @@ int64_t debug_init(void)
 	result = lv1_net_control(bus_id, dev_id, GELIC_LV1_GET_VLAN_ID, \
 							 GELIC_LV1_VLAN_TX_ETHERNET_0, 0, 0, &vlan_id, &v2);
 
-	if (result == 0)
+	if (result == 0) 
 	{
 		h_eth->type = 0x8100;
 
@@ -193,8 +193,8 @@ int64_t debug_init(void)
 		h_vlan->vlan = vlan_id;
 		h_vlan->subtype = 0x0800;
 		h_ip = (struct iphdr*)(h_vlan+1);
-	}
-	else
+	} 
+	else 
 	{
 		h_eth->type = 0x0800;
 		h_ip = (struct iphdr*)(h_eth+1);
@@ -242,7 +242,7 @@ int64_t debug_print(const char* buffer, size_t msgsize)
 	u16 *p = (u16*)h_ip;
 	int i;
 
-	for (i = 0; i < 5; i++)
+	for (i=0; i<5; i++)
 		sum += *p++;
 
 	h_ip->checksum = ~(sum + (sum>>16));
@@ -257,7 +257,7 @@ int64_t debug_print(const char* buffer, size_t msgsize)
 		return ret;
 
 	while ((dbg->descr.dmac_cmd_status & GELIC_DESCR_DMA_STAT_MASK) == GELIC_DESCR_DMA_CARDOWNED);
-	return 0;
+		return 0;
 }
 
 #ifdef PS2EMU
@@ -303,11 +303,11 @@ void fatal(const char *msg)
 void debug_print_hex(void *buf, uint64_t size)
 {
 	uint8_t *buf8 = (uint8_t *)buf;
-
+	
 	for (uint64_t i = 0; i < size; i++)
 	{
 		_debug_printf("%02X ", buf8[i]);
-
+		
 		if ((i&0xF) == 0xF || i == (size-1))
 			_debug_printf("\n");
 	}
@@ -316,11 +316,11 @@ void debug_print_hex(void *buf, uint64_t size)
 void debug_print_hex_c(void *buf, uint64_t size)
 {
 	uint8_t *buf8 = (uint8_t *)buf;
-
+	
 	for (uint64_t i = 0; i < size; i++)
 	{
 		_debug_printf("0x%02X, ", buf8[i]);
-
+		
 		if ((i&0xF) == 0xF || i == (size-1))
 			_debug_printf("\n");
 	}

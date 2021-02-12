@@ -9,7 +9,7 @@
 #define SPRX_EXT_MAGIC2		    0x4A52A57F5957E800ULL
 #define SPRX_EXT_MAGIC_MASK	  0xFFFFFFFFFFFFFF00ULL
 
-typedef struct
+typedef struct 
 {
   uint32_t magic;               // 0
   uint32_t version;             // 4
@@ -195,8 +195,8 @@ typedef struct
 } SELF_SECTION;
 
 
-typedef struct
-{
+typedef struct 
+{	
 	uint64_t magic;
 	uint64_t nonce_mod;
 	uint8_t keys_mod[16];

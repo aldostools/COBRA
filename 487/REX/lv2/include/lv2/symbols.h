@@ -590,6 +590,7 @@
 #define DO_AUTO_MOUNT_DEV_BLIND
 #define DO_PARTIAL_MAP_PATH
 #define DO_PATCH_KERNEL_PATCH
+#define DO_CFW2OFW_FIX
 #define FAN_CONTROL
 #define APPLY_KERNEL_PATCHES
 //#define DO_PATCH_PS2 // ps2emu patches are hardcoded in Rebug
