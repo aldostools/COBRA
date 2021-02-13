@@ -13,6 +13,7 @@ static uint16_t device_type;
 static int total_emulation;
 static ScsiTrackDescriptor *tracks;
 static uint8_t num_tracks;
+static uint32_t base_offset = 0;
 
 static INLINE void my_memcpy(uint8_t *dst, uint8_t *src, int size)
 {
@@ -39,7 +40,7 @@ static INLINE int cd_iso_read2048(uint8_t *buf, uint32_t lba, uint32_t length)
 
 		if (fit > 0)
 		{
-			ufs_read(iso_fd, lba*2352, buf, fit*2352);
+			ufs_read(iso_fd, base_offset + (lba*2352), buf, fit*2352);
 
 			for (i = 0; i < fit; i++)
 			{
@@ -52,13 +53,15 @@ static INLINE int cd_iso_read2048(uint8_t *buf, uint32_t lba, uint32_t length)
 
 		for (i = 0; i < rem; i++)
 		{
-			ufs_read(iso_fd, (lba*2352)+24, out, 2048);
+			ufs_read(iso_fd, base_offset + (lba*2352)+24, out, 2048);
 			out += 2048;
 			lba++;
 		}
 	}
 	else
-		ufs_read(iso_fd, lba*2048, buf, length*2048);
+	{
+		ufs_read(iso_fd, base_offset + (lba*2048), buf, length*2048);
+	}
 
 	return 0;
 }
@@ -84,7 +87,7 @@ static INLINE int cd_iso_read2340(uint8_t *buf, uint32_t lba, uint32_t length)
 
 		if (fit > 0)
 		{
-			ufs_read(iso_fd, lba*2352, buf, fit*2352);
+			ufs_read(iso_fd, base_offset + (lba*2352), buf, fit*2352);
 
 			for (i = 0; i < fit; i++)
 			{
@@ -97,14 +100,14 @@ static INLINE int cd_iso_read2340(uint8_t *buf, uint32_t lba, uint32_t length)
 
 		for (i = 0; i < rem; i++)
 		{
-			ufs_read(iso_fd, (lba*2352)+12, out, 2340);
+			ufs_read(iso_fd, base_offset + (lba*2352)+12, out, 2340);
 			out += 2340;
 			lba++;
 		}
 	}
 	else
 	{
-		ufs_read(iso_fd, lba*2048, buf, length*2048);
+		ufs_read(iso_fd, base_offset + (lba*2048), buf, length*2048);
 
 		uint8_t *in = buf+(2048*(length-1));
 		uint8_t *out = buf+(2340*(length-1));
@@ -128,10 +131,12 @@ static INLINE int cd_iso_read2340(uint8_t *buf, uint32_t lba, uint32_t length)
 static INLINE int cd_iso_read2352(uint8_t *buf, uint32_t lba, uint32_t length)
 {
 	if (IS_2352())
-		ufs_read(iso_fd, lba*2352, buf, length*2352);
+	{
+		ufs_read(iso_fd, base_offset + (lba*2352), buf, length*2352);
+	}
 	else
 	{
-		ufs_read(iso_fd, lba*2048, buf, length*2048);
+		ufs_read(iso_fd, base_offset + (lba*2048), buf, length*2048);
 
 		uint8_t *in = buf+(2048*(length-1));
 		uint8_t *out = buf+(2352*(length-1));
@@ -164,12 +169,18 @@ static INLINE ScsiTrackDescriptor *find_track_by_lba(uint32_t lba)
 		uint32_t track_end;
 
 		if (i == (n-1))
+		{
 			track_end = iso_size_sectors;
+		}
 		else
+		{
 			track_end = tracks[i+1].track_start_addr;
+		}
 
 		if (lba >= track_start && lba < track_end)
+		{
 			return &tracks[i];
+		}
 	}
 
 	return NULL;
@@ -180,11 +191,15 @@ static INLINE int cd_iso_read2364(uint8_t *buf, uint32_t lba, uint32_t length)
 	uint32_t sector_size;
 
 	if (IS_2352())
+	{
 		sector_size = 2352;
+	}
 	else
+	{
 		sector_size = 2048;
+	}
 
-	ufs_read(iso_fd, lba*sector_size, buf, length*sector_size);
+	ufs_read(iso_fd, base_offset + (lba*sector_size), buf, length*sector_size);
 
 	uint8_t *in = buf+(sector_size*(length-1));
 	uint8_t *out = buf+(2364*(length-1));
@@ -207,7 +222,9 @@ static INLINE int cd_iso_read2364(uint8_t *buf, uint32_t lba, uint32_t length)
 			memset(out+2072, 0, 280);
 		}
 		else
+		{
 			my_memcpy2(out, in, 2352);
+		}
 
 		subq = (SubChannelQ *)(out+2352);
 		memset(subq, 0, sizeof(SubChannelQ));
@@ -241,7 +258,7 @@ static INLINE int cd_iso_read2364(uint8_t *buf, uint32_t lba, uint32_t length)
 
 static INLINE int dvd_iso_read2048(uint8_t *buf, uint64_t lba, uint32_t length)
 {
-	ufs_read(iso_fd, lba*2048, buf, length*2048);
+	ufs_read(iso_fd, base_offset + (lba*2048), buf, length*2048);
 	return 0;
 }
 
@@ -253,7 +270,7 @@ static INLINE int dvd_iso_read2064(uint8_t *buf, uint64_t lba, uint32_t length)
 		return 0;
 	}
 
-	ufs_read(iso_fd, lba*2048, buf, length*2048);
+	ufs_read(iso_fd, base_offset + (lba*2048), buf, length*2048);
 
 	uint8_t *in = buf+(2048*(length-1));
 	uint8_t *out = buf+(2064*(length-1));
@@ -268,7 +285,9 @@ static INLINE int dvd_iso_read2064(uint8_t *buf, uint64_t lba, uint32_t length)
 		uint32_t id;
 
 		if (!is_dual_layer || lba < layer0_size)
+		{
 			id = 0x030000 + lba;
+		}
 		else
 		{
 			id = 0x030000 + (lba-layer0_size);
@@ -290,7 +309,9 @@ static void *temp_buf;
 static INLINE void *get_temp_buf(void)
 {
 	if (!temp_buf)
+	{
 		temp_buf = malloc(0x800);
+	}
 
 	return temp_buf;
 }
@@ -315,7 +336,7 @@ static void check_double_layer(void)
 
 	dvd_iso_read2048(buf, 0x10, 1);
 
-	if (buf[0] != 1 || memcmp(buf + 1, "CD001", 5) != 0)
+	if (buf[0] != 1 || memcmp(buf+1, "CD001", 5) != 0)
 		return;
 
 	uint32_t sector = *(uint32_t *)&buf[0x54];
@@ -325,7 +346,7 @@ static void check_double_layer(void)
 
 	dvd_iso_read2048(buf, sector, 1);
 
-	if (buf[0] != 1 || memcmp(buf + 1, "CD001", 5) != 0)
+	if (buf[0] != 1 || memcmp(buf+1, "CD001", 5) != 0)
 		return;
 
 	layer0_size = sector;
@@ -335,8 +356,8 @@ static void check_double_layer(void)
 
 static INLINE int setup_iso(void)
 {
-	int disable_chk = ufs_open(0, "/tmp/loadoptical");
-	if(disable_chk >= 0)
+	int disable_chk=ufs_open(0, "/tmp/loadoptical");
+	if(disable_chk>=0)
 	{
 		ufs_close(disable_chk);
 		return -2;
@@ -356,31 +377,34 @@ static INLINE int setup_iso(void)
 		return -2;
 	}
 
-	if (memcmp(buf + 1, "/dev_hdd0/", 10) != 0)
+	if (memcmp(buf+1, "/dev_hdd0/", 10) != 0)
 	{
 		release_temp_buf();
 		ufs_close(cfg_fd);
 		return -1;
 	}
-
-	if(memcmp(buf + 0x702, "mount", 5) != 0)
+	if(memcmp(buf+0x702, "mount", 5)!=0)
 	{
-		release_temp_buf();
 		ufs_close(cfg_fd);
+		release_temp_buf();
 		return -1;
 	}
 
 	// uint8_t disable=0x00;
 	//ufs_write(cfg_fd, 0x702, &disable, 1);
+
 	file = buf + 10;
 
-	iso_fd = ufs_open(0, file);
+	iso_fd =  ufs_open(0, file);
 	if (iso_fd < 0)
 	{
 		release_temp_buf();
 		ufs_close(cfg_fd);
 		return -1;
 	}
+
+	int len = strlen(file) - 4;
+	if (memcmp(file+len, ".PNG", 4) == 0) base_offset = 0x10000; // 64KB
 
 	iso_size = get_file_size(iso_fd);
 	iso_size_sectors = iso_size / 2048;
@@ -390,7 +414,9 @@ static INLINE int setup_iso(void)
 	layer0_size = iso_size_sectors;
 
 	if (device_type == DEVICE_TYPE_PS2_DVD)
+	{
 		check_double_layer();
+	}
 	else
 	{
 		ufs_read(cfg_fd, 0x800, &num_tracks, sizeof(num_tracks));
@@ -423,10 +449,14 @@ static INLINE int process_other_cmd(uint8_t *cmd, uint8_t *out, uint64_t outlen)
 	{
 		ret = 1;
 		if (out)
+		{
 			memset(out, 0, outlen);
+		}
 	}
 	else
+	{
 		ret = 0;
+	}
 
 	switch (cmd[0])
 	{
@@ -447,7 +477,9 @@ static INLINE int process_other_cmd(uint8_t *cmd, uint8_t *out, uint64_t outlen)
 					resp->media_status = 2;
 				}
 				else
+				{
 					DPRINTF("Event status: %02X\n", esn->notification_class_request);
+				}
 			}
 		}
 
@@ -493,7 +525,9 @@ static INLINE int process_scsi_cmd_iso(uint8_t *cmd, uint8_t *out, uint64_t outl
 			uint32_t end_sector;
 
 			if (device_type == DEVICE_TYPE_PS2_CD)
+			{
 				DPRINTF("Read Disc Structure on CD!!!! \n");
+			}
 
 			if (rds->format != 0)
 			{
@@ -506,7 +540,9 @@ static INLINE int process_scsi_cmd_iso(uint8_t *cmd, uint8_t *out, uint64_t outl
 			if (is_dual_layer)
 			{
 				if (rds->layer_num == 0)
+				{
 					end_sector = start_sector + layer0_size - 1;
+				}
 				else
 				{
 					DPRINTF("SCSI_CMD_READ_DISC_STRUCTURE: Requesting layer1 structure.\n");
@@ -514,7 +550,9 @@ static INLINE int process_scsi_cmd_iso(uint8_t *cmd, uint8_t *out, uint64_t outl
 				}
 			}
 			else
+			{
 				end_sector = start_sector + iso_size_sectors - 1;
+			}
 
 			memset(resp, 0, sizeof(ScsiReadDiscStructureFormat0Response));
 			resp->length = 2050;
@@ -634,9 +672,13 @@ static INLINE int process_scsi_cmd_iso(uint8_t *cmd, uint8_t *out, uint64_t outl
 			//DPRINTF("Read CD (lba=%x,length=%x,misc=%x,scsb=%x)\n", readcd->lba, length, readcd->misc, readcd->rv_scsb);
 
 			if (readcd->misc == 0x10)
+			{
 				cd_iso_read2328(out, readcd->lba, length);
+			}
 			else if (readcd->misc == 0x78)
+			{
 				cd_iso_read2340(out, readcd->lba, length);
+			}
 			else if (readcd->misc == 0xF8)
 			{
 				if (readcd->rv_scsb == 0)
@@ -679,7 +721,9 @@ static INLINE void optical_dvd_read_2064(uint8_t *buf, uint64_t lba, uint32_t le
 		uint32_t id;
 
 		if (!is_dual_layer || lba < layer0_size)
+		{
 			id = 0x030000 + lba;
+		}
 		else
 		{
 			id = 0x030000 + (lba-layer0_size);
@@ -703,10 +747,13 @@ static INLINE int post_process_scsi_cmd_optical(uint8_t *cmd, uint8_t *out, uint
 			DPRINTF("Device type %x\n", device_type);
 
 			if (device_type == DEVICE_TYPE_CD)
+			{
 				*(uint16_t *)&out[6] = DEVICE_TYPE_PS2_CD;
+			}
 			else if (device_type == DEVICE_TYPE_DVD)
+			{
 				*(uint16_t *)&out[6] = DEVICE_TYPE_PS2_DVD;
-
+			}
 			break;
 		}
 
