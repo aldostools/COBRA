@@ -32,6 +32,7 @@ see file COPYING or http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 #endif
 
 #include "printf.h"
+#include <lv2/fan.h>
 
 #undef printf
 
@@ -42,20 +43,20 @@ static int dev_id;
 
 static u64 bus_addr;
 
-struct ethhdr 
+struct ethhdr
 {
 	uint8_t dest[6];
 	uint8_t src[6];
 	uint16_t type;
 } __attribute__((packed));
 
-struct vlantag 
+struct vlantag
 {
 	uint16_t vlan;
 	uint16_t subtype;
 } __attribute__((packed));
 
-struct iphdr 
+struct iphdr
 {
 	uint8_t ver_len;
 	uint8_t dscp_ecn;
@@ -69,7 +70,7 @@ struct iphdr
 	uint32_t dest;
 } __attribute__((packed));
 
-struct udphdr 
+struct udphdr
 {
 	uint16_t src;
 	uint16_t dest;
@@ -86,7 +87,7 @@ static char *pmsg;
 
 #define MAX_MESSAGE_SIZE 1000
 
-struct debug_block 
+struct debug_block
 {
 	volatile struct gelic_descr descr;
 	uint8_t pkt[1520];
@@ -116,16 +117,16 @@ void debug_uninstall(void)
 
 LV2_SYSCALL(int, ttyWrite, (int channel, const char* message, int length, int* written))
 {
-	debug_print(message, length);	
+	debug_print(message, length);
 	if (written)
-		*written = length;	
+		*written = length;
 
 	return 0;
 }
 
 LV2_SYSCALL(int, consoleWrite, (const char* message, int length))
 {
-	debug_print(message, length);			
+	debug_print(message, length);
 	return 0;
 }
 
@@ -174,7 +175,7 @@ int64_t debug_init(void)
 	mac <<= 16;
 
 	h_eth = (struct ethhdr*)dbg->pkt;
-	
+
 	memset(&h_eth->dest, 0xff, 6);
 	memcpy(&h_eth->src, &mac, 6);
 
@@ -184,7 +185,7 @@ int64_t debug_init(void)
 	result = lv1_net_control(bus_id, dev_id, GELIC_LV1_GET_VLAN_ID, \
 							 GELIC_LV1_VLAN_TX_ETHERNET_0, 0, 0, &vlan_id, &v2);
 
-	if (result == 0) 
+	if (result == 0)
 	{
 		h_eth->type = 0x8100;
 
@@ -193,8 +194,8 @@ int64_t debug_init(void)
 		h_vlan->vlan = vlan_id;
 		h_vlan->subtype = 0x0800;
 		h_ip = (struct iphdr*)(h_vlan+1);
-	} 
-	else 
+	}
+	else
 	{
 		h_eth->type = 0x0800;
 		h_ip = (struct iphdr*)(h_eth+1);
@@ -288,6 +289,7 @@ int64_t debug_print(const char* buffer, size_t msgsize)
 void abort(void)
 {
 	_debug_printf("abort() called! Panicking.\n");
+	sm_set_fan_policy(0, 1, 0);
 	lv1_panic(0);
 	while (1);
 }
@@ -296,6 +298,7 @@ void fatal(const char *msg)
 {
 	_debug_printf("FATAL: %s\n", msg);
 	_debug_printf("Panicking.\n");
+	sm_set_fan_policy(0, 1, 0);
 	lv1_panic(0);
 	while (1);
 }
@@ -303,11 +306,11 @@ void fatal(const char *msg)
 void debug_print_hex(void *buf, uint64_t size)
 {
 	uint8_t *buf8 = (uint8_t *)buf;
-	
+
 	for (uint64_t i = 0; i < size; i++)
 	{
 		_debug_printf("%02X ", buf8[i]);
-		
+
 		if ((i&0xF) == 0xF || i == (size-1))
 			_debug_printf("\n");
 	}
@@ -316,11 +319,11 @@ void debug_print_hex(void *buf, uint64_t size)
 void debug_print_hex_c(void *buf, uint64_t size)
 {
 	uint8_t *buf8 = (uint8_t *)buf;
-	
+
 	for (uint64_t i = 0; i < size; i++)
 	{
 		_debug_printf("0x%02X, ", buf8[i]);
-		
+
 		if ((i&0xF) == 0xF || i == (size-1))
 			_debug_printf("\n");
 	}
