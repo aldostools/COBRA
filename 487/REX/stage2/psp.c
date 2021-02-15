@@ -44,7 +44,7 @@ static uint64_t emulator_api_base;
 static uint32_t *savedata_param;
 
 /* vsh.self */
-SprxPatch psp_drm_patches[] =
+static SprxPatch psp_drm_patches[] =
 {
 	{ cex_psp_drm_patch1, LI(R3, 0) 	},
 	{ cex_psp_drm_patch2, LI(R3, 0) 	},
@@ -59,7 +59,7 @@ SprxPatch psp_drm_patches[] =
 	{ 0 }
 };
 
-SprxPatch psp_drm_dex_patches[] =
+static SprxPatch psp_drm_dex_patches[] =
 {
 	{ dex_psp_drm_patch1, LI(R3, 0) 	},
 	{ dex_psp_drm_patch2, LI(R3, 0) 	},
@@ -74,7 +74,7 @@ SprxPatch psp_drm_dex_patches[] =
 	{ 0 }
 };
 
-SprxPatch *patches_backup;
+static SprxPatch *patches_backup;
 
 static INLINE uint32_t swap32(uint32_t data)
 {

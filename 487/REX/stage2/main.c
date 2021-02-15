@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <lv2/lv2.h>
-#include <lv2/fan.h>
+#include <lv2/ctrl.h>
 #include <lv2/libc.h>
 #include <lv2/memory.h>
 #include <lv2/patch.h>
@@ -456,17 +456,17 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_GET_PROC_MODULE_FILENAME:
 					return ps3mapi_get_process_module_filename_by_prx_id((process_id_t)param2, (sys_prx_id_t)param3, (char *)param4);
 				break;
-				case PS3MAPI_OPCODE_GET_PROC_MODULE_INFO:
-					return ps3mapi_get_process_module_info((process_t)param2, (sys_prx_id_t)param3, (char *)param4, (char *)param5);
-				break;
-				case PS3MAPI_OPCODE_GET_PROC_MODULE_SEGMENTS:
-					return ps3mapi_get_process_module_segments((process_id_t)param2, (sys_prx_id_t)param3, (sys_prx_module_info_t *)param4); // TheRouletteBoi
-				break;
 				case PS3MAPI_OPCODE_LOAD_PROC_MODULE:
 					return ps3mapi_load_process_modules((process_id_t)param2, (char *)param3, (void *)param4, (uint32_t)param5);
 				break;
 				case PS3MAPI_OPCODE_UNLOAD_PROC_MODULE:
 					return ps3mapi_unload_process_modules((process_id_t)param2, (sys_prx_id_t)param3);
+				break;
+				case PS3MAPI_OPCODE_GET_PROC_MODULE_INFO:
+					return ps3mapi_get_process_module_info((process_t)param2, (sys_prx_id_t)param3, (char *)param4, (char *)param5);
+				break;
+				case PS3MAPI_OPCODE_GET_PROC_MODULE_SEGMENTS:
+					return ps3mapi_get_process_module_segments((process_id_t)param2, (sys_prx_id_t)param3, (sys_prx_module_info_t *)param4); // TheRouletteBoi
 				break;
 
 				//----------
@@ -576,6 +576,12 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 
 				case PS3MAPI_OPCODE_GET_FAN_SPEED:
 					return sm_get_fan_speed();
+				break;
+				#endif
+
+				#ifdef sm_ring_buzzer_symbol
+				case PS3MAPI_OPCODE_RING_BUZZER:
+					return sm_ring_buzzer((uint16_t)param2);
 				break;
 				#endif
 
@@ -776,7 +782,7 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 		break;
 
 		//--------------------------
-		// PLUGINS
+		// VSH PLUGINS
 		//--------------------------
 		case SYSCALL8_OPCODE_LOAD_VSH_PLUGIN:
 			return sys_prx_load_vsh_plugin(param1, (char *)param2, (void *)param3, param4);

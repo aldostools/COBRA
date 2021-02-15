@@ -889,10 +889,10 @@ int device_event_func(event_port_t port, uint64_t event, uint64_t param, uint64_
 
 static int process_fake_storage_event_cmd(FakeStorageEventCmd *cmd)
 {
-	uint64_t *ptr = (uint64_t *)(*(uint64_t *)MKA(TOC+device_event_rtoc_entry_1));
+	uint64_t *ptr = (uint64_t *)(*(uint64_t *)MKA(TOC + device_event_rtoc_entry_1));
 	ptr = (uint64_t *)ptr[0];
 
-	event_port_t port = (event_port_t)ptr[0x40/8];
+	event_port_t port = (event_port_t)ptr[0x40 / 8];
 
 	loop = 1;
 	int ret = device_event_func(port, cmd->event, cmd->param, cmd->device);
@@ -973,7 +973,7 @@ static uint32_t find_file_sector(uint8_t *buf, char *file)
 	uint8_t *p =  (uint8_t *)buf;
 	int len = strlen(file);
 
-	while (((p+p[0]) < (buf+2048)) && (p[0] != 0))
+	while (((p + p[0]) < (buf + 2048)) && (p[0] != 0))
 	{
 		if ((p[0x20] == len) && (strncasecmp((char *)p + 0x21, file, len) == SUCCEEDED))
 		{
@@ -1355,7 +1355,7 @@ static void process_disc_insert(uint32_t disctype)
 			if(real_disctype && (real_disctype != DEVICE_TYPE_PS3_BD) && (fake_disctype == 0 && is_psx(3)))
 			{
 				fake_disctype = effective_disctype = DEVICE_TYPE_PS3_BD;
-				emu_ps3_rec=1;
+				emu_ps3_rec = 1;
 			}
 
 		break;
@@ -2623,26 +2623,6 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 		DPRINTF("cellFsUtilMount: %s\n", mount_point);
 	#endif
 
-	#ifdef DO_CFW2OFW_FIX
-	if(CFW2OFW_game && !strcmp(mount_point, "/dev_bdvd/PS3_GAME"))
-	{
-		CFW2OFW_game = 0;
-
-		#ifdef DEBUG
-		DPRINTF("Detected CFW2OFW game: Unmounting DISC\n");
-		#endif
-
-		sys_storage_ext_umount_discfile();
-
-		map_path("/dev_bdvd/PS3_GAME", NULL, 0);
-		map_path("/app_home/PS3_GAME", NULL, 0);
-		map_path("/dev_bdvd", NULL, 0);
-		map_path("/app_home", NULL, 0);
-		map_path("//dev_bdvd", NULL, 0);
-		map_path("//app_home", NULL, 0);
-	}
-	#endif
-
 	if (!hdd0_mounted && strcmp(mount_point, "/dev_hdd0") == 0 && strcmp(filesystem, "CELL_FS_UFS") == 0)
 	{
 		hdd0_mounted = 1;
@@ -2676,6 +2656,26 @@ LV2_HOOKED_FUNCTION_PRECALL_SUCCESS_8(int, post_cellFsUtilMount, (const char *bl
 		#endif
 	}
 
+	#ifdef DO_CFW2OFW_FIX
+	if(CFW2OFW_game && !strcmp(mount_point, "/dev_bdvd/PS3_GAME"))
+	{
+		CFW2OFW_game = 0;
+
+		#ifdef DEBUG
+		DPRINTF("Detected CFW2OFW game: Unmounting DISC\n");
+		#endif
+
+		sys_storage_ext_umount_discfile();
+
+		map_path("/dev_bdvd/PS3_GAME", NULL, 0);
+		map_path("/app_home/PS3_GAME", NULL, 0);
+		map_path("/dev_bdvd", NULL, 0);
+		map_path("/app_home", NULL, 0);
+		map_path("//dev_bdvd", NULL, 0);
+		map_path("//app_home", NULL, 0);
+	}
+	#endif
+
 	return 0;
 }
 
@@ -2699,8 +2699,8 @@ static INLINE int get_ps2emu_type(void)
 
 static const char *ps2emu_stage2[] =
 {
-	"ps2hwemu",
-	"ps2gxemu",
+	"ps2hw",
+	"ps2gx",
 };
 
 static INLINE void copy_ps2emu_stage2(int emu_type)
@@ -2713,7 +2713,7 @@ static INLINE void copy_ps2emu_stage2(int emu_type)
 	if (!buf) return;
 
 	char stage2[40];
-	sprintf(stage2, "/dev_flash/ps2emu/%s_stage2.bin", ps2emu_stage2[emu_type]);
+	sprintf(stage2, "/dev_flash/ps2emu/%semu_stage2.bin", ps2emu_stage2[emu_type]);
 
 	size_t size = read_file(stage2, buf, _64KB_);
 	if(size)

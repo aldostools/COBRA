@@ -182,6 +182,7 @@
 #define sm_get_temperature_symbol						0x2635A8
 #define sm_get_fan_policy_symbol						0x26293C
 #define sm_set_fan_policy_symbol						0x264734
+#define sm_ring_buzzer_symbol							0x26337C
 
 #define SHA1_init_symbol								0x2ce688
 #define SHA1_update_symbol								0x2ce6e8

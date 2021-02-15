@@ -32,7 +32,7 @@ see file COPYING or http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 #endif
 
 #ifdef FAN_CONTROL
-#include <lv2/fan.h>
+#include <lv2/ctrl.h>
 #endif
 
 #include "printf.h"

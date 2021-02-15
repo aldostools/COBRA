@@ -92,14 +92,17 @@ Original COBRA payload was relying on ps1emu's detection method, now COBRA has e
 * BASIC_PLUGIN hash is commented.
 * 80010006 Error fix when trying to install a game update with syscall disabled. Fix & Research @Joonie @Alexander @Aldo
 * PhotoGUI integration with webMAN MOD
-* Re-enable syscalls without reboot entering to system update in XMB
+* Restore disabled CFW Syscalls without Reboot just entering to Settings > System Update on XMB
 * Dynamic fan controller without external application
 * Auto-mount dev_blind
 * Query map path table (SYSCALL8_OPCODE_GET_MAP_PATH)
-* Support for 32 map path entries
+* Increased from 16 to 32 the max number of map paths
 * Support for non deletable map path entries (allow updates) /./path/etc
 * Support for partial map paths (search non existing files in original path) //path/etc
 * Fixed status returned by dynamic kernel plugins (unsigned function returned -1, -2, etc)
+* Added ps3mapi_get_process_module_info
+* Support for ISO spoofed as fake PNG adding a segment of 64KB
+* PS3 disc backups detected by PS3_GAME folder if standard checks fail
 
 [ Alexander's changes ]
 
@@ -108,17 +111,25 @@ Original COBRA payload was relying on ps1emu's detection method, now COBRA has e
 [ Haxxxen's changes ]
 
 * Extra patch for PSP SAVE DATA is disabled by default to improve compatibility, however can be toggled by CROSS+R1 when launching PSP launcher.
-* Added support for system modules in ps3mapi_load_process_modules
+* Added support to load custom modules and system modules in ps3mapi_load_process_modules
+* Disable stage2.bin while Recovery Menu is loaded
 
 [Evilnat's changes]
 
-* Improvements to Fan Control
+* Improvements to Fan Control 
+    . FAN payload avoids loading previous mode
+    . Added sm_get_temperature patch in kernel
+    . Added sm_get_fan_policy patch in kernel
+    . Added sm_set_fan_policy patch in kernel
 * Support for QA flags based on Habib's code
 * Updated KW's code to search webMAN in flash and load it firstly if it's found in /dev_hdd0, will search in the following paths:
 	- /dev_flash/vsh/module/webftp_server.sprx
 	- /dev_flash/ps3ita/webftp_server.sprx
 	- /dev_flash/webman/webftp_server.sprx 
 	- /dev_flash/dragon/web.sprx
+* Fixed max FAN speed after shutdown
+* Fixed black screen in CFW2OFW converted games
+* Added ring buzzer to PS3MAPI
 
 [TheRouletteBoi's changes]
 

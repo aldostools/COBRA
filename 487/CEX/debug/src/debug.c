@@ -32,7 +32,7 @@ see file COPYING or http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
 #endif
 
 #include "printf.h"
-#include <lv2/fan.h>
+#include <lv2/ctrl.h>
 
 #undef printf
 
