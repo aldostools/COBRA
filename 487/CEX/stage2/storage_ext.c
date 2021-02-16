@@ -2460,7 +2460,7 @@ static const char *ps2emu_stage2[] =
 	"ps2gx",
 };
 
-static INLINE void copy_ps2emu_stage2(int emu_type)
+void copy_ps2emu_stage2(int emu_type)
 {
 	char name[64];
 	int src, dst;
