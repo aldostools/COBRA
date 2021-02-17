@@ -17,7 +17,7 @@ This repository will have constant changes.
     . Support Photo GUI integration with webMAN MOD (mount games from Photo column) (by aldo/DeViL303)
     . Get / Set fan speed (by aldo)
     . Enable/disable features: Photo GUI, Restore Syscalls (by aldo)
-    . Opcode to create CFW Syscalls (6, 7, 8, 9, 10, 11, 15) (by aldo)
+    . Opcode to create CFW Syscalls (6, 7, 8, 9, 10, 11, 15, 389, 409) (by aldo)
     . Updated ps3mapi_load_process_modules to load custom modules and system modules (by haxxxen)
     . Added ps3mapi_get_process_module_info
     . Increased from 24 to 32 the max number of map paths (by aldo)
@@ -29,7 +29,7 @@ This repository will have constant changes.
     . Fixed max FAN speed after shutdown (by Evilnat)
     . Improved Habib's QA flags code imported by aldostools (by Evilnat)
 	. Fixed black screen in CFW2OFW converted games (by Evilnat)
+	. Added sm_ring_buzzer with single_beep, double_beep and triple_beep (by Evilnat)
     
 ###### To do:
     . reActPSN
-    . Improve entire code

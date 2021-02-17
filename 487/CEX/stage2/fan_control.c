@@ -31,7 +31,7 @@ static void fan_control(uint64_t arg0)
 {
 	DPRINTF("CONTROL FAN Payload: Started.\n");
 
-	uint32_t t_cpu, t_rsx, prev = 0;
+	uint32_t t_cpu, t_rsx, prev = 0; 
 	fan_control_running = 1;
 
 	while(fan_control_running)
@@ -41,14 +41,14 @@ static void fan_control(uint64_t arg0)
 		if(fan_control_running) // Avoids loading previous mode [Evilnat]
 		{
 			t_cpu = t_rsx = 0;
-
+			
 			sm_get_temperature(0, &t_cpu);
 			sm_get_temperature(1, &t_rsx);
 
-			if(t_rsx > t_cpu)
+			if(t_rsx > t_cpu) 
 				t_cpu = t_rsx;
-
-			if(prev == t_cpu)
+			
+			if(prev == t_cpu) 
 				continue;
 
 			// 60°C=31%, 61°C=33%, 62°C=35%, 63°C=37%, 64°C=39%, 65°C=41%, 66°C=43%, 67°C=45%, 68°C=47%, 69°C=49%
@@ -74,8 +74,8 @@ void do_fan_control(void)
 {
 	thread_t fan_control_id;
 
-	if(!fan_control_running)
-		ppu_thread_create(&fan_control_id, fan_control, 0, -0x1D8, 0x4000, 0, "fan_control");
+	if(!fan_control_running)	
+		ppu_thread_create(&fan_control_id, fan_control, 0, -0x1D8, 0x4000, 0, "fan_control");	
 }
 
 void load_fan_control(void)
@@ -83,7 +83,7 @@ void load_fan_control(void)
 	if(fan_speed == 0) // Disabled
 		return;
 	else if(fan_speed >= 0x33 && fan_speed <= 0xFE) // Manual mode
-		sm_set_fan_policy(0, 2, fan_speed);
+		sm_set_fan_policy(0, 2, fan_speed); 
 	else if(fan_speed == 1)  // SYSCON mode
 		sm_set_fan_policy(0, 1, 0);
 	else
@@ -101,7 +101,7 @@ LV2_HOOKED_FUNCTION_COND_POSTCALL_3(int, sys_shutdown, (uint16_t op, const void 
 {
 	// Avoids max FAN speed after a shutdown by Evilnat
 	if(op == SYS_SHUTDOWN || op == SYS_SHUTDOWN2)
-	{
+	{		
 		DPRINTF("Shutdown executed, resetting FAN policy\n");
 		sm_set_fan_policy(0, 1, 0);
 	}
