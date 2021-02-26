@@ -29,6 +29,8 @@ extern uint8_t photo_gui;			// mappath.c
 extern uint8_t auto_earth;			// mappath.c
 #endif
 
+extern uint8_t skip_existing_rif;	// make_rif.h;
+
 void load_fan_control(void);
 
 static void check_and_correct(CobraConfig *cfg)
@@ -114,20 +116,22 @@ int read_cobra_config(void)
 	bd_video_region = config.bd_video_region;
 	dvd_video_region = config.dvd_video_region;
 
+	skip_existing_rif = config.skip_existing_rif;
+
 	#ifdef DO_AUTO_MOUNT_DEV_BLIND
-	auto_dev_blind   = !config.auto_dev_blind;		// 0 = Allow auto-mount /dev_blind   | 1 = Does not allow auto-mount /dev_blind
+	auto_dev_blind   = config.auto_dev_blind;	// 1 = Allow auto-mount /dev_blind   | 0 = Does not allow auto-mount /dev_blind
 	#endif
 	#ifdef DO_AUTO_RESTORE_SC
-	allow_restore_sc = !config.allow_restore_sc;	// 0 = Allow to restore CFW syscalls | 1 = Does not allow to restore CFW syscalls
+	allow_restore_sc = config.allow_restore_sc;	// 1 = Allow to restore CFW syscalls | 0 = Does not allow to restore CFW syscalls
 	#endif
 	#ifdef DO_PHOTO_GUI
-	photo_gui        = !config.photo_gui;			// 0 = Allow Photo GUI				 | 1 = Does not allow Photo GUI
+	photo_gui        = config.photo_gui;		// 1 = Allow Photo GUI				 | 0 = Does not allow Photo GUI
 	#endif
 	#ifdef DO_AUTO_EARTH
-	auto_earth       = !config.auto_earth;			// 0 = Allow auto-map earth.qrc      | 1 = Does not allow auto-map earth.qrc
+	auto_earth       = config.auto_earth;		// 1 = Allow auto-map earth.qrc      | 0 = Does not allow auto-map earth.qrc
 	#endif
 	#ifdef FAN_CONTROL
-	set_fan_speed    = config.fan_speed;			// 0 = DISABLED, 1 = SYSCON, 2 = Dynamic Fan Controller, 0x33 to 0xFF = Set manual fan speed
+	set_fan_speed    = config.fan_speed;		// 1 = DISABLED, 1 = SYSCON, 2 = Dynamic Fan Controller, 0x33 to 0xFF = Set manual fan speed
 	load_fan_control();
 	#endif
 
@@ -197,6 +201,24 @@ int sys_write_cobra_config(CobraConfig *cfg)
 	memcpy(&config.checksum, &cfg->checksum, copy_size);*/
 	bd_video_region = config.bd_video_region;
 	dvd_video_region = config.dvd_video_region;
+	#ifdef FAN_CONTROL
+	set_fan_speed = config.fan_speed;
+	#endif
+	#ifdef DO_AUTO_RESTORE_SC
+	allow_restore_sc = config.allow_restore_sc;
+	#endif
+	#ifdef DO_PHOTO_GUI
+	photo_gui = config.photo_gui;
+	#endif
+	#ifdef DO_AUTO_EARTH
+	auto_earth = config.auto_earth
+	#endif
+	#ifdef DO_AUTO_MOUNT_DEV_BLIND
+	auto_dev_blind = config.auto_dev_blind;
+	#endif
+
+	skip_existing_rif = config.skip_existing_rif;
+
 	// Removed. Now condition_ps2softemu has another meaning and it is set automatically in storage_ext if no BC console
 	//condition_ps2softemu = config.ps2softemu;
 
