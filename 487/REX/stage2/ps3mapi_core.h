@@ -88,8 +88,8 @@ int ps3mapi_unload_process_modules(process_id_t pid, sys_prx_id_t prx_id);
 
 int ps3mapi_get_vsh_plugin_info(unsigned int slot, char *name, char *filename);
 int ps3mapi_get_vsh_plugin_slot_by_name(const char *name, uint8_t unload);
-int prx_unload_vsh_plugin(unsigned int slot);
 int ps3mapi_unload_vsh_plugin(char* name);
+int sys_prx_unload_vsh_plugin(unsigned int slot);
 int prx_start_modules(sys_prx_id_t id, process_t process, uint64_t flags, uint64_t arg);
 
 //-----------------------------------------------

@@ -192,8 +192,8 @@ extern uint8_t safe_mode;
 /* Functions for kernel */
 void modules_patch_init(void);
 void load_boot_plugins(void);
-int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_size);
-int prx_unload_vsh_plugin(unsigned int slot);
+//int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_size);
+//int prx_unload_vsh_plugin(unsigned int slot);
 
 void load_boot_plugins_kernel(void);
 

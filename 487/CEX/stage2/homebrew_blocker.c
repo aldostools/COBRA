@@ -27,6 +27,8 @@ int CFW2OFW_game = 0;
 
 uint8_t allow_restore_sc = 1;
 
+extern uint8_t skip_existing_rif;
+
 static int __initialized_lists = 0; // Are the lists initialized ?
 static int __blacklist_entries = 0; // Module global var to hold the current blacklist entries.
 static char __blacklist[9 * MAX_LIST_ENTRIES];
@@ -170,10 +172,12 @@ int block_homebrew(const char *path)
 
 void restore_syscalls(const char *path)
 {
-	// Restore disabled CFW Syscalls without reboot just entering to Settings > System Update on XMB - aldostools
-	if(allow_restore_sc)
+	if(!strcmp(path, "/dev_flash/vsh/module/software_update_plugin.sprx"))
 	{
-		if(!strcmp(path, "/dev_flash/vsh/module/software_update_plugin.sprx"))
+		skip_existing_rif = 0;
+
+		// Restore disabled CFW Syscalls without reboot just entering to Settings > System Update on XMB - aldostools
+		if(allow_restore_sc)
 		{
 			uint8_t syscalls_disabled = ((*(uint64_t *)MKA(syscall_table_symbol + 8 * 6)) == (*(uint64_t *)MKA(syscall_table_symbol)));
 

@@ -73,6 +73,7 @@ int sys_storage_ext_mount_discfile_proxy(sys_event_port_t result_port, sys_event
 
 void unhook_all_storage_ext(void);
 void copy_ps2emu_stage2(int emu_type);
+int save_file(const char *path, void *buf, size_t size);
 
 #endif /* __STORAGE_EXT_H__ */
 

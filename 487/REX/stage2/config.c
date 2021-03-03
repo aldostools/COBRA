@@ -83,6 +83,20 @@ static void check_and_correct(CobraConfig *cfg)
 	if (cfg->spoof_revision > MAX_SPOOF_REVISION)*/
 		cfg->spoof_revision = 0;
 
+	if(cfg->size == 0)
+	{
+		config.skip_existing_rif = 1;
+		#ifdef DO_AUTO_MOUNT_DEV_BLIND
+		config.auto_dev_blind = 1;
+		#endif
+		#ifdef DO_AUTO_RESTORE_SC
+		config.allow_restore_sc = 1;
+		#endif
+		#ifdef DO_PHOTO_GUI
+		config.photo_gui = 1;
+		#endif
+	}
+
 	if (cfg->size > sizeof(CobraConfig))
 		cfg->size = sizeof(CobraConfig);
 }

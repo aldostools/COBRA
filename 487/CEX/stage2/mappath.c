@@ -215,14 +215,6 @@ int sys_map_paths(char *paths[], char *new_paths[], unsigned int num)
 	return ret;
 }
 
-void aescbc128_decrypt(unsigned char *key, unsigned char *iv, unsigned char *in, unsigned char *out, int len)
-{
-	aescbccfb_dec(out, in, len, key, 128, iv);
-
-	// Reset the IV.
-	memset(iv, 0, 0x10);
-}
-
 static uint8_t libft2d_access = 0;
 LV2_HOOKED_FUNCTION_POSTCALL_2(void, open_path_hook, (char *path0, int mode))
 {

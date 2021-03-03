@@ -2851,42 +2851,37 @@ LV2_HOOKED_FUNCTION(int, shutdown_copy_params_patched, (uint8_t *argp_user, uint
 
 	if (prepare_ps2emu)
 	{
-		int fd;
-
-		if (cellFsOpen(PS2EMU_CONFIG_FILE, CELL_FS_O_WRONLY | CELL_FS_O_CREAT | CELL_FS_O_TRUNC, &fd, 0666, NULL, 0) == SUCCEEDED)
+		if (disc_emulation == EMU_PS2_DVD || disc_emulation == EMU_PS2_CD)
 		{
-			if (disc_emulation == EMU_PS2_DVD || disc_emulation == EMU_PS2_CD)
+			uint8_t *buf;
+
+			page_allocate_auto(NULL, _4KB_, (void **)&buf);
+
+			if(buf)
 			{
-				uint8_t *buf;
+				memset(buf, 0, _4KB_);
+				// bit 0-> is cd
+				// bit 1 -> total emulation
+				buf[0] = (disc_emulation == EMU_PS2_CD) | ((real_disctype == 0)<<1);
+				strncpy((char *)buf+1, (discfile_cd) ? discfile_cd->file : discfile->files[0], 0x7FE);
 
-				page_allocate_auto(NULL, _4KB_, (void **)&buf);
-
-				if(buf)
+				// TODO: this will need change when adding proxy to PS2
+				if (discfile_cd)
 				{
-					memset(buf, 0, _4KB_);
-					// bit 0-> is cd
-					// bit 1 -> total emulation
-					buf[0] = (disc_emulation == EMU_PS2_CD) | ((real_disctype == 0)<<1);
-					strncpy((char *)buf+1, (discfile_cd) ? discfile_cd->file : discfile->files[0], 0x7FE);
-
-					// TODO: this will need change when adding proxy to PS2
-					if (discfile_cd)
-					{
-						buf[0x800] = discfile_cd->numtracks;
-						memcpy(buf + 0x801, discfile_cd->tracks, discfile_cd->numtracks*sizeof(ScsiTrackDescriptor));
-					}
-
-					buf[0x702] = 'm'; // 0x6d;
-					buf[0x703] = 'o'; // 0x6f;
-					buf[0x704] = 'u'; // 0x75;
-					buf[0x705] = 'n'; // 0x6e;
-					buf[0x706] = 't'; // 0x74;
+					buf[0x800] = discfile_cd->numtracks;
+					memcpy(buf + 0x801, discfile_cd->tracks, discfile_cd->numtracks*sizeof(ScsiTrackDescriptor));
 				}
 
-				save_file(PS2EMU_CONFIG_FILE, buf, _4KB_);
-
-				free_page(NULL, buf);
+				buf[0x702] = 'm'; // 0x6d;
+				buf[0x703] = 'o'; // 0x6f;
+				buf[0x704] = 'u'; // 0x75;
+				buf[0x705] = 'n'; // 0x6e;
+				buf[0x706] = 't'; // 0x74;
 			}
+
+			save_file(PS2EMU_CONFIG_FILE, buf, _4KB_);
+
+			free_page(NULL, buf);
 		}
 		else if (real_disctype == DEVICE_TYPE_PS2_DVD || real_disctype == DEVICE_TYPE_PS2_CD)
 		{

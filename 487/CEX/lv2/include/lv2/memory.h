@@ -33,32 +33,10 @@ LV2_EXPORT int page_free(process_t process, void *page_addr, uint64_t flags);
 LV2_EXPORT int page_export_to_proc(process_t process, void *page_addr, uint64_t flags, void **process_page_addr);
 LV2_EXPORT int page_unexport_from_proc(process_t process, void *process_page_addr);
 
-static INLINE int page_allocate_auto(process_t process, uint64_t size, uint64_t flags, void **page_addr)
-{
-	uint64_t page_size;
-	
-	if (size >= 0x100000)
-	{
-		size = (size+0xFFFFF) & ~0xFFFFF;
-		page_size = MEMORY_PAGE_SIZE_1M;
-	}
-	else if (size >= 0x10000)
-	{
-		size = (size+0xFFFF) & ~0xFFFF; 
-		page_size = MEMORY_PAGE_SIZE_64K;
-	}
-	else
-	{
-		if (size > 0x1000)		
-			size = (size+0xFFF) & ~0xFFF;	
-		else		
-			size = 0x1000;		
-		
-		page_size = MEMORY_PAGE_SIZE_4K;
-	}
-	
-	return page_allocate(process, size, flags, page_size, page_addr);
-}
+void *kalloc(size_t size);
+void kfree(void *ptr);
+int free_page(process_t process, void *page_addr);
+int page_allocate_auto(process_t process, uint64_t size, void **page_addr);
 
 static INLINE int process_ea_to_lpar_addr(process_t process, void *ea_addr, uint64_t *lpar_addr)
 {
@@ -73,14 +51,14 @@ static INLINE void *get_secure_user_ptr(void *ptr)
 static INLINE void get_slb(uint64_t entry, uint64_t *esid, uint64_t *vsid)
 {
 	uint64_t _esid, _vsid;
-	
+
 	__asm__ __volatile__(
         "slbmfev %0,%2\n"
         "slbmfee %1,%2\n"
         :"=&r"(_vsid), "=&r"(_esid)
         :"r"(entry)
         :"memory");
-	
+
 	*esid = _esid;
 	*vsid = _vsid;
 }

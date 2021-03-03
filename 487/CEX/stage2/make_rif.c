@@ -10,10 +10,20 @@
 
 uint8_t skip_existing_rif = 0;
 
-unsigned char RAP_KEY[] =  { 0x86, 0x9F, 0x77, 0x45, 0xC1, 0x3F, 0xD8, 0x90, 0xCC, 0xF2, 0x91, 0x88, 0xE3, 0xCC, 0x3E, 0xDF };
-unsigned char RAP_PBOX[] = { 0x0C, 0x03, 0x06, 0x04, 0x01, 0x0B, 0x0F, 0x08, 0x02, 0x07, 0x00, 0x05, 0x0A, 0x0E, 0x0D, 0x09 };
-unsigned char RAP_E1[] =   { 0xA9, 0x3E, 0x1F, 0xD6, 0x7C, 0x55, 0xA3, 0x29, 0xB7, 0x5F, 0xDD, 0xA6, 0x2A, 0x95, 0xC7, 0xA5 };
-unsigned char RAP_E2[] =   { 0x67, 0xD4, 0x5D, 0xA3, 0x29, 0x6D, 0x00, 0x6A, 0x4E, 0x7C, 0x53, 0x7B, 0xF5, 0x53, 0x8C, 0x74 };
+static unsigned char RAP_KEY[] =  { 0x86, 0x9F, 0x77, 0x45, 0xC1, 0x3F, 0xD8, 0x90, 0xCC, 0xF2, 0x91, 0x88, 0xE3, 0xCC, 0x3E, 0xDF };
+static unsigned char RAP_PBOX[] = { 0x0C, 0x03, 0x06, 0x04, 0x01, 0x0B, 0x0F, 0x08, 0x02, 0x07, 0x00, 0x05, 0x0A, 0x0E, 0x0D, 0x09 };
+static unsigned char RAP_E1[] =   { 0xA9, 0x3E, 0x1F, 0xD6, 0x7C, 0x55, 0xA3, 0x29, 0xB7, 0x5F, 0xDD, 0xA6, 0x2A, 0x95, 0xC7, 0xA5 };
+static unsigned char RAP_E2[] =   { 0x67, 0xD4, 0x5D, 0xA3, 0x29, 0x6D, 0x00, 0x6A, 0x4E, 0x7C, 0x53, 0x7B, 0xF5, 0x53, 0x8C, 0x74 };
+
+static uint8_t make_rif_buf[0x20 + 0x28 + 0x50 + 0x20 + 0x28]; // ACT_DAT[0x20] + CONTENT_ID[0x28] + RAP_PATH[0x50] + RIF_BUFFER[0x20] (rif_buffer reuse rap_path + 0x20 = 0x70)+0x28(signaturs)
+
+static void aescbc128_decrypt(unsigned char *key, unsigned char *iv, unsigned char *in, unsigned char *out, int len)
+{
+	aescbccfb_dec(out, in, len, key, 128, iv);
+
+	// Reset the IV.
+	memset(iv, 0, 0x10);
+}
 
 static void get_rif_key(unsigned char* rap, unsigned char* rif)
 {
@@ -56,17 +66,17 @@ static void get_rif_key(unsigned char* rap, unsigned char* rif)
 				o = kc < ec2 ? 1 : 0;
 				key[p] = kc - ec2;
 			}
-			else if (kc == 0xFF)			
-				key[p] = kc - ec2;			
-			else			
-				key[p] = kc;			
+			else if (kc == 0xFF)
+				key[p] = kc - ec2;
+			else
+				key[p] = kc;
 		}
 	}
 
 	memcpy(rif, key, 0x10);
 }
 
-void read_act_dat_and_make_rif(uint8_t *rap, uint8_t *act_dat, const char *content_id, const char *rif_path)
+static void read_act_dat_and_make_rif(uint8_t *rap, uint8_t *act_dat, const char *content_id, const char *rif_path)
 {
 	int fd;
 
@@ -126,7 +136,7 @@ void make_rif(const char *path)
 	{
 		// Skip the creation of rif if already exists - By aldostool's
 		CellFsStat stat;
-		if(skip_existing_rif && (cellFsStat(path, &stat) == SUCCEEDED)) 
+		if(skip_existing_rif && (cellFsStat(path, &stat) == SUCCEEDED))
 		{
 			#ifdef DEBUG
 				DPRINTF("rif already exists, skipping...\n");
@@ -146,26 +156,26 @@ void make_rif(const char *path)
 		char *rap_path = ALLOC_PATH_BUFFER;
 
 		uint8_t is_ps2_classic = !strncmp(content_id, "2P0001-PS2U10000_00-0000111122223333", 0x24);
-		uint8_t is_psp_launcher = !strncmp(content_id, "UP0001-PSPC66820_00-0000111122223333", 0x24);
 
-		if(!is_ps2_classic && !is_psp_launcher)
+		if(!is_ps2_classic)
 		{
-			CellFsStat stat;
-			sprintf(rap_path, "/dev_usb000/exdata/%.36s.rap", content_id);
-
-			if(cellFsStat(rap_path, &stat) != SUCCEEDED) 
-				rap_path[10] = '1'; //usb001
-			if(cellFsStat(rap_path, &stat) != SUCCEEDED) 
-				sprintf(rap_path, "/dev_hdd0/exdata/%.36s.rap", content_id);
+			const char *ext = ".rap";
+			for(uint8_t i = 0; i < 2; i++)
+			{
+				sprintf(rap_path, "/dev_usb000/exdata/%.36s%s", content_id, ext);
+				if(cellFsStat(rap_path, &stat)) {rap_path[10] = '1'; //usb001
+				if(cellFsStat(rap_path, &stat)) sprintf(rap_path, "/dev_hdd0/exdata/%.36s%s", content_id, ext);}
+				if(cellFsStat(rap_path, &stat)) ext = ".RAP"; else break;
+			}
 		}
 
 		int fd;
-		if(is_ps2_classic || is_psp_launcher || cellFsOpen(rap_path, CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) == SUCCEEDED)
+		if(is_ps2_classic || cellFsOpen(rap_path, CELL_FS_O_RDONLY, &fd, 0666, NULL, 0) == SUCCEEDED)
 		{
 			uint64_t nread = 0;
 			uint8_t rap[0x10] = {0xF5, 0xDE, 0xCA, 0xBB, 0x09, 0x88, 0x4F, 0xF4, 0x02, 0xD4, 0x12, 0x3C, 0x25, 0x01, 0x71, 0xD9};
 
-			if(!is_ps2_classic && !is_psp_launcher)
+			if(!is_ps2_classic)
 			{
 				cellFsRead(fd, rap, 0x10, &nread);
 				cellFsClose(fd);

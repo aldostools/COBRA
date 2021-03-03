@@ -21,9 +21,9 @@
 
 uint64_t *idps;
 uint64_t IDPS_1, IDPS_2;
-uint32_t UM_ori_patch, DM_ori_patch1, DM_ori_patch2, DM_ori_patch3, DM_ori_patch4;
+static uint32_t UM_ori_patch, DM_ori_patch1, DM_ori_patch2, DM_ori_patch3, DM_ori_patch4;
 
-static u8 erk[0x20] = 
+static u8 erk[0x20] =
 {
 	0x34, 0x18, 0x12, 0x37, 0x62, 0x91, 0x37, 0x1c,
 	0x8b, 0xc7, 0x56, 0xff, 0xfc, 0x61, 0x15, 0x25,
@@ -31,7 +31,7 @@ static u8 erk[0x20] =
 	0x64, 0x82, 0xee, 0xc2, 0x16, 0xb5, 0x62, 0xed
 };
 
-static u8 hmac[0x40] = 
+static u8 hmac[0x40] =
 {
 	0xcc, 0x30, 0xc4, 0x22, 0x91, 0x13, 0xdb, 0x25,
 	0x73, 0x35, 0x53, 0xaf, 0xd0, 0x6e, 0x87, 0x62,
@@ -43,7 +43,7 @@ static u8 hmac[0x40] =
 	0x75, 0x06, 0xa6, 0xb5, 0xe0, 0xf9, 0xd9, 0x7a
 };
 
-static u8 iv_qa[0x10] = 
+static u8 iv_qa[0x10] =
 {
 	0xe8, 0x66, 0x3a, 0x69, 0xcd, 0x1a, 0x5c, 0x45,
 	0x4a, 0x76, 0x1e, 0x72, 0x8c, 0x7c, 0x25, 0x4e
@@ -60,18 +60,18 @@ static u8 iv_qa[0x10] =
 * @param t   Size of digest output
 */
 
-static void hmac_sha1(const u8 *k, u8 lk, const u8 *d, size_t ld, u8 *out)	
+static void hmac_sha1(const u8 *k, u8 lk, const u8 *d, size_t ld, u8 *out)
 {
-	SHACtx *ictx = malloc(0x100); 
+	SHACtx *ictx = malloc(0x100);
 
-	if(!ictx) 
+	if(!ictx)
 		return;
 
-	SHACtx *octx = malloc(0x100); 
+	SHACtx *octx = malloc(0x100);
 
-	if(!octx) 
+	if(!octx)
 	{
-		free(ictx); 
+		free(ictx);
 		return;
 	}
 
@@ -96,25 +96,25 @@ static void hmac_sha1(const u8 *k, u8 lk, const u8 *d, size_t ld, u8 *out)
 	sha1_init(ictx);
 
 	// Pad the key for inner digest
-	for (i = 0; i < lk; ++i)	
-		buf[i] = k[i] ^ 0x36;	
-	for (i = lk; i < SHA_BLOCKSIZE; ++i)	
-		buf[i] = 0x36;	
+	for (i = 0; i < lk; ++i)
+		buf[i] = k[i] ^ 0x36;
+	for (i = lk; i < SHA_BLOCKSIZE; ++i)
+		buf[i] = 0x36;
 
 	sha1_update(ictx, buf, SHA_BLOCKSIZE);
 	sha1_update(ictx, d, ld);
 
 	sha1_final(isha, ictx);
 
-	// Outer Digest 
+	// Outer Digest
 	sha1_init(octx);
 
-	// Pad the key for outter digest 
+	// Pad the key for outter digest
 
-	for (i = 0; i < lk; ++i)	
-		buf[i] = k[i] ^ 0x5c;	
-	for (i = lk; i < SHA_BLOCKSIZE; ++i)	
-		buf[i] = 0x5c;	
+	for (i = 0; i < lk; ++i)
+		buf[i] = k[i] ^ 0x5c;
+	for (i = lk; i < SHA_BLOCKSIZE; ++i)
+		buf[i] = 0x5c;
 
 	sha1_update(octx, buf, SHA_BLOCKSIZE);
 	sha1_update(octx, isha, SHA_DIGEST_LENGTH);
@@ -133,55 +133,55 @@ static void lv1_patches()
 	DM_ori_patch3 = lv1_peekw(DM_PATCH3_OFFSET);
 	DM_ori_patch4 = lv1_peekw(DM_PATCH4_OFFSET);
 
-	lv1_pokew(UM_PATCH_OFFSET, LI(R0, 0)); 
-    lv1_pokew(DM_PATCH1_OFFSET, NOP); 
-    lv1_pokew(DM_PATCH2_OFFSET, LI(R3, 1)); 
-    lv1_pokew(DM_PATCH3_OFFSET, LI(R31, 1)); 
-    lv1_pokew(DM_PATCH4_OFFSET, LI(R3, 0)); 
+	lv1_pokew(UM_PATCH_OFFSET, LI(R0, 0));
+	lv1_pokew(DM_PATCH1_OFFSET, NOP);
+	lv1_pokew(DM_PATCH2_OFFSET, LI(R3, 1));
+	lv1_pokew(DM_PATCH3_OFFSET, LI(R31, 1));
+	lv1_pokew(DM_PATCH4_OFFSET, LI(R3, 0));
 }
 
 static void restore_patches()
 {
-	lv1_pokew(UM_PATCH_OFFSET, UM_ori_patch); 
-    lv1_pokew(DM_PATCH1_OFFSET, DM_ori_patch1); 
-    lv1_pokew(DM_PATCH2_OFFSET, DM_ori_patch2); 
-    lv1_pokew(DM_PATCH3_OFFSET, DM_ori_patch3);
-    lv1_pokew(DM_PATCH4_OFFSET, DM_ori_patch4); 
+	lv1_pokew(UM_PATCH_OFFSET, UM_ori_patch);
+	lv1_pokew(DM_PATCH1_OFFSET, DM_ori_patch1);
+	lv1_pokew(DM_PATCH2_OFFSET, DM_ori_patch2);
+	lv1_pokew(DM_PATCH3_OFFSET, DM_ori_patch3);
+	lv1_pokew(DM_PATCH4_OFFSET, DM_ori_patch4);
 }
 
 static int get_idps()
 {
-	uint32_t nread;	
+	uint32_t nread;
 	uint64_t device;
 	uint64_t start_flash_sector = 0x181;
 	device_handle_t handle;
 
-	page_allocate_auto(NULL, 4096, 0x2F, (void **)&idps);
+	page_allocate_auto(NULL, 4096, (void **)&idps);
 
 	device = storage_get_flash_device();
 
-	if(!device)	
+	if(!device)
 		start_flash_sector = 0x20D;
 
 	DPRINTF("Flash Device: %016lX\n", device);
 
 	if(storage_open(device, 0, &handle, 0))
 		return 1;
-	
+
 	if(storage_map_io_memory(device, idps, 4096))
-		return 1;	
+		return 1;
 
 	if(call_hooked_function_7(emu_storage_read, (uint64_t)handle, 0, start_flash_sector, 1, (uint64_t)idps, (uint64_t)&nread, 0))
-		return 1;	
+		return 1;
 
 	memcpy(&IDPS_1, (void *)&idps[0x3A], 8);
 	memcpy(&IDPS_2, (void *)&idps[0x3B], 8);
 
 	DPRINTF("IDPS from EID5: %016lX%016lX\n", IDPS_1, IDPS_2);
-			
+
 	storage_close(handle);
 	storage_unmap_io_memory(device, idps);
-	page_free(NULL, idps, 0x2F);
+	free_page(NULL, idps);
 
 	return SUCCEEDED;
 }
@@ -196,7 +196,7 @@ uint8_t read_qa_flag()
 int set_qa_flag(uint8_t value)
 {
 	uint8_t seed[TOKEN_SIZE];
-	uint8_t token[TOKEN_SIZE];	
+	uint8_t token[TOKEN_SIZE];
 
 	if(get_idps())
 		return 2;
@@ -218,7 +218,7 @@ int set_qa_flag(uint8_t value)
 		seed[39] |= 0x1; // QA_FLAG_EXAM_API_ENABLE
 		seed[39] |= 0x2; // QA_FLAG_QA_MODE_ENABLE
 
-		seed[47] |= 0x2; // checked by lv2_kernel.self and sys_init_osd.self 
+		seed[47] |= 0x2; // checked by lv2_kernel.self and sys_init_osd.self
 		seed[47] |= 0x4; // can run sys_init_osd.self from /app_home ?
 
 		seed[51] |= 0x1; // QA_FLAG_ALLOW_NON_QA
@@ -283,10 +283,10 @@ int set_qa_flag(uint8_t value)
 
 	nwritten = len;
 
-	update_mgr_write_eeprom(QA_FLAG_OFFSET, (value) ? 0x00 : 0xFF, LV2_AUTH_ID); 
+	update_mgr_write_eeprom(QA_FLAG_OFFSET, (value) ? 0x00 : 0xFF, LV2_AUTH_ID);
 
 	DPRINTF("QA Flag: %s\n", (value) ? "Enabled (Value: 0x00)" : "Disabled (Value: 0xFF)");
-	
+
 	restore_patches();
 
 	return SUCCEEDED;

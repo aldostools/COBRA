@@ -423,7 +423,7 @@ int ps3mapi_load_process_modules(process_id_t pid, char *path, void *arg, uint32
 
 	if (arg && arg_size > 0)
 	{
-		page_allocate_auto(process, KB(64), 0x2F, &kbuf);
+		page_allocate_auto(process, KB(64), &kbuf);
 		page_export_to_proc(process, kbuf, 0x40000, &vbuf);
 		memcpy(kbuf, arg, arg_size);
 	}
@@ -438,7 +438,7 @@ int ps3mapi_load_process_modules(process_id_t pid, char *path, void *arg, uint32
 	if (vbuf)
 	{
 		page_unexport_from_proc(process, vbuf);
-		page_free(process, kbuf, 0x2F);
+		free_page(process, kbuf);
 	}
 
 	if (ret != SUCCEEDED)

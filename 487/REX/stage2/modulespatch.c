@@ -1004,7 +1004,7 @@ int bc_to_net(int param)
 }*/
 
 // Kernel version of prx_load_vsh_plugin
-int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_size)
+static int prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t arg_size)
 {
 	void *kbuf, *vbuf;
 	sys_prx_id_t prx;
@@ -1086,7 +1086,7 @@ int sys_prx_load_vsh_plugin(unsigned int slot, char *path, void *arg, uint32_t a
 }
 
 // Kernel version of prx_unload_vsh_plugin
-int prx_unload_vsh_plugin(unsigned int slot)
+static int prx_unload_vsh_plugin(unsigned int slot)
 {
 	int ret;
 	sys_prx_id_t prx;
